@@ -9,8 +9,8 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
-            background-color: #CC338B; /* Fondo magenta */
-            color: #fff; /* Letras blancas */
+            background-color: #CC338B;
+            color: #fff;
         }
         .container {
             display: flex;
@@ -26,37 +26,47 @@
             max-width: 800px;
         }
         .sentence {
-            border: 2px dashed #fff; /* Borde blanco */
+            border: 2px dashed #fff;
             padding: 10px;
-            width: 45%; /* Ajustado para dos columnas */
+            width: 45%;
             max-width: 350px;
             margin: 10px;
-            background-color: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            color: #fff; /* Letras blancas */
+            color: #fff;
         }
         .modal {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #28a745; /* Color verde */
+            background-color: #28a745;
             color: white;
             border-radius: 25px;
             cursor: grab;
             margin: 5px;
         }
         .modal.could {
-            background-color: #3598db; /* Color azul */
+            background-color: #3598db;
         }
         .feedback {
             margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
-            color: #fff; /* Letras blancas */
+            color: #fff;
         }
         .success-image {
             display: none;
             margin-top: 20px;
             max-width: 300px;
+        }
+        .restart-button {
+            display: none;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -98,11 +108,11 @@
         </div>
 
         <div class="feedback" id="feedback"></div>
-        <img id="successImage" class="success-image" src="https://image.pollinations.ai/prompt/ia%20sonriendo?width=300&height=300&nologo=true" alt="IA Sonriendo">
+        <img id="successImage" class="success-image" src="https://image.pollinations.ai/prompt/androide%20humanoide%20espacial%20futurista?width=300&height=300&nologo=true" alt="Androide Humanoide Espacial Futurista">
+        <button id="restartButton" class="restart-button" onclick="restartActivity()">Volver a intentar</button>
     </div>
 
     <script>
-        // Funciones para arrastrar y soltar
         function allowDrop(event) {
             event.preventDefault();
         }
@@ -117,7 +127,6 @@
             const modal = document.getElementById(data);
             const sentence = event.target;
 
-            // Verificar si el modal es correcto
             if (
                 sentence.textContent.includes("doctor") ||
                 sentence.textContent.includes("tired") ||
@@ -144,6 +153,7 @@
                 }
             }
         }
+
         function checkCompletion() {
             const sentences = document.querySelectorAll('.sentence');
             let completed = true;
@@ -155,7 +165,20 @@
             if (completed) {
                 document.getElementById('feedback').textContent = "¡Felicidades! ¡Todo correcto!";
                 document.getElementById('successImage').style.display = 'block';
+                document.getElementById('restartButton').style.display = 'block';
             }
+        }
+
+        function restartActivity() {
+            const sentences = document.querySelectorAll('.sentence');
+            sentences.forEach(sentence => {
+                if (sentence.textContent.includes('should') || sentence.textContent.includes('could')) {
+                    sentence.textContent = sentence.textContent.replace('should', '______').replace('could', '______');
+                }
+            });
+            document.getElementById('feedback').textContent = "";
+            document.getElementById('successImage').style.display = 'none';
+            document.getElementById('restartButton').style.display = 'none';
         }
     </script>
 
