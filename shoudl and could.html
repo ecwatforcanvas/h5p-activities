@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad: Should y Could</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #000; /* Fondo negro */
+            color: #fff; /* Letras blancas */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .sentence {
+            border: 2px dashed #ccc;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            margin: 10px 0;
+            background-color: #333; /* Fondo gris oscuro */
+            border-radius: 10px;
+            color: #fff; /* Letras blancas */
+        }
+        .modal {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745; /* Color verde */
+            color: white;
+            border-radius: 25px;
+            cursor: grab;
+            margin: 5px;
+        }
+        .modal.could {
+            background-color: #3598db; /* Color azul */
+        }
+        .feedback {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff; /* Letras blancas */
+        }
+        .embed-code {
+            margin-top: 30px;
+            background-color: #444;
+            padding: 15px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            text-align: left;
+            font-family: monospace;
+            color: #fff;
+            word-wrap: break-word;
+        }
+        .embed-code h3 {
+            margin-top: 0;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Actividad: Arrastra "Should" o "Could" a la oración correcta</h1>
+
+    <div class="container">
+        <!-- Oraciones -->
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            You ______ see a doctor if you feel sick.
+        </div>
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            I ______ help you with your homework.
+        </div>
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            She ______ take a break if she's tired.
+        </div>
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            We ______ go to the park if it stops raining.
+        </div>
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            They ______ visit their grandparents this weekend.
+        </div>
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            He ______ call his friend to apologize.
+        </div>
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            You ______ try this new restaurant; it's amazing!
+        </div>
+        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+            I ______ borrow your pen for a moment?
+        </div>
+
+        <!-- Modales para arrastrar -->
+        <div>
+            <div id="should" class="modal" draggable="true" ondragstart="drag(event)">Should</div>
+            <div id="could" class="modal could" draggable="true" ondragstart="drag(event)">Could</div>
+        </div>
+
+        <!-- Feedback -->
+        <div class="feedback" id="feedback"></div>
+
+        <!-- Código de embed -->
+        <div class="embed-code">
+            <h3>Instrucciones para incrustar en tu curso en línea:</h3>
+            <p>1. Copia el siguiente código y pégalo en tu plataforma:</p>
+            <textarea id="embed-text" rows="5" cols="50" readonly style="width: 100%; background-color: #333; color: #fff; border: none; padding: 10px; border-radius: 5px;">
+<iframe src="https://TU_USUARIO_DE_GITHUB.github.io/TU_REPOSITORIO/index.html" width="100%" height="600px" frameborder="0" allowfullscreen></iframe>
+            </textarea>
+            <p>2. Reemplaza <strong>TU_USUARIO_DE_GITHUB</strong> y <strong>TU_REPOSITORIO</strong> con los datos de tu repositorio.</p>
+        </div>
+    </div>
+
+    <script>
+        // Funciones para arrastrar y soltar
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData("text");
+            const modal = document.getElementById(data);
+            const sentence = event.target;
+
+            // Verificar si el modal es correcto
+            if (
+                sentence.textContent.includes("doctor") ||
+                sentence.textContent.includes("tired") ||
+                sentence.textContent.includes("grandparents") ||
+                sentence.textContent.includes("apologize") ||
+                sentence.textContent.includes("restaurant")
+            ) {
+                if (data === "should") {
+                    sentence.textContent = sentence.textContent.replace("______", "should");
+                    document.getElementById("feedback").textContent = "¡Correcto!";
+                } else {
+                    document.getElementById("feedback").textContent = "Intenta de nuevo.";
+                }
+            } else if (
+                sentence.textContent.includes("help") ||
+                sentence.textContent.includes("park") ||
+                sentence.textContent.includes("borrow")
+            ) {
+                if (data === "could") {
+                    sentence.textContent = sentence.textContent.replace("______", "could");
+                    document.getElementById("feedback").textContent = "¡Correcto!";
+                } else {
+                    document.getElementById("feedback").textContent = "Intenta de nuevo.";
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
