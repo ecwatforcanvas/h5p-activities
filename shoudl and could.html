@@ -108,11 +108,16 @@
         </div>
 
         <div class="feedback" id="feedback"></div>
-        <img id="successImage" class="success-image" src="https://image.pollinations.ai/prompt/androide%20humanoide%20espacial%20futurista?width=300&height=300&nologo=true" alt="Androide Humanoide Espacial Futurista">
+        <img id="successImage1" class="success-image" src="https://image.pollinations.ai/prompt/ia%20sonriendo?width=300&height=300&nologo=true" alt="IA Sonriendo">
+        <img id="successImage2" class="success-image" src="https://image.pollinations.ai/prompt/androide%20humanoide%20espacial%20futurista?width=300&height=300&nologo=true" alt="Androide Humanoide Espacial Futurista">
+        <img id="errorImage" class="success-image" src="https://image.pollinations.ai/prompt/robot%20enojado?width=300&height=300&nologo=true" alt="robot enojado">
         <button id="restartButton" class="restart-button" onclick="restartActivity()">Volver a intentar</button>
     </div>
 
     <script>
+        let attemptCount = 0;
+        let errorCount = 0;
+
         function allowDrop(event) {
             event.preventDefault();
         }
@@ -138,6 +143,8 @@
                     sentence.textContent = sentence.textContent.replace("______", "should");
                     checkCompletion();
                 } else {
+                    errorCount++;
+                    handleError();
                     document.getElementById("feedback").textContent = "Intenta de nuevo.";
                 }
             } else if (
@@ -149,6 +156,8 @@
                     sentence.textContent = sentence.textContent.replace("______", "could");
                     checkCompletion();
                 } else {
+                    errorCount++;
+                    handleError();
                     document.getElementById("feedback").textContent = "Intenta de nuevo.";
                 }
             }
@@ -164,7 +173,11 @@
             });
             if (completed) {
                 document.getElementById('feedback').textContent = "¡Felicidades! ¡Todo correcto!";
-                document.getElementById('successImage').style.display = 'block';
+                if (attemptCount === 0) {
+                    document.getElementById('successImage1').style.display = 'block';
+                } else {
+                    document.getElementById('successImage2').style.display = 'block';
+                }
                 document.getElementById('restartButton').style.display = 'block';
             }
         }
@@ -177,8 +190,18 @@
                 }
             });
             document.getElementById('feedback').textContent = "";
-            document.getElementById('successImage').style.display = 'none';
+            document.getElementById('successImage1').style.display = 'none';
+            document.getElementById('successImage2').style.display = 'none';
+            document.getElementById('errorImage').style.display = 'none';
             document.getElementById('restartButton').style.display = 'none';
+            attemptCount++;
+            errorCount = 0;
+        }
+
+        function handleError() {
+            if (errorCount >= 2) {
+                document.getElementById('errorImage').style.display = 'block';
+            }
         }
     </script>
 
