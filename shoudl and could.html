@@ -18,12 +18,19 @@
             align-items: center;
             gap: 20px;
         }
+        .sentences-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 90%;
+            max-width: 800px;
+        }
         .sentence {
             border: 2px dashed #fff; /* Borde blanco */
             padding: 10px;
-            width: 80%;
-            max-width: 400px;
-            margin: 10px 0;
+            width: 45%; /* Ajustado para dos columnas */
+            max-width: 350px;
+            margin: 10px;
             background-color: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
             border-radius: 10px;
             color: #fff; /* Letras blancas */
@@ -46,6 +53,11 @@
             font-weight: bold;
             color: #fff; /* Letras blancas */
         }
+        .success-image {
+            display: none;
+            margin-top: 20px;
+            max-width: 300px;
+        }
     </style>
 </head>
 <body>
@@ -53,40 +65,40 @@
     <h1>Actividad: Arrastra "Should" o "Could" a la oración correcta</h1>
 
     <div class="container">
-        <!-- Oraciones -->
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            You ______ see a doctor if you feel sick.
-        </div>
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            I ______ help you with your homework.
-        </div>
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            She ______ take a break if she's tired.
-        </div>
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            We ______ go to the park if it stops raining.
-        </div>
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            They ______ visit their grandparents this weekend.
-        </div>
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            He ______ call his friend to apologize.
-        </div>
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            You ______ try this new restaurant; it's amazing!
-        </div>
-        <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
-            I ______ borrow your pen for a moment?
+        <div class="sentences-container">
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                You ______ see a doctor if you feel sick.
+            </div>
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                I ______ help you with your homework.
+            </div>
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                She ______ take a break if she's tired.
+            </div>
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                We ______ go to the park if it stops raining.
+            </div>
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                They ______ visit their grandparents this weekend.
+            </div>
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                He ______ call his friend to apologize.
+            </div>
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                You ______ try this new restaurant; it's amazing!
+            </div>
+            <div class="sentence" ondrop="drop(event)" ondragover="allowDrop(event)">
+                I ______ borrow your pen for a moment?
+            </div>
         </div>
 
-        <!-- Modales para arrastrar -->
         <div>
             <div id="should" class="modal" draggable="true" ondragstart="drag(event)">Should</div>
             <div id="could" class="modal could" draggable="true" ondragstart="drag(event)">Could</div>
         </div>
 
-        <!-- Feedback -->
         <div class="feedback" id="feedback"></div>
+        <img id="successImage" class="success-image" src="https://image.pollinations.ai/prompt/ia%20sonriendo?width=300&height=300&nologo=true" alt="IA Sonriendo">
     </div>
 
     <script>
@@ -115,7 +127,7 @@
             ) {
                 if (data === "should") {
                     sentence.textContent = sentence.textContent.replace("______", "should");
-                    document.getElementById("feedback").textContent = "¡Correcto!";
+                    checkCompletion();
                 } else {
                     document.getElementById("feedback").textContent = "Intenta de nuevo.";
                 }
@@ -126,10 +138,23 @@
             ) {
                 if (data === "could") {
                     sentence.textContent = sentence.textContent.replace("______", "could");
-                    document.getElementById("feedback").textContent = "¡Correcto!";
+                    checkCompletion();
                 } else {
                     document.getElementById("feedback").textContent = "Intenta de nuevo.";
                 }
+            }
+        }
+        function checkCompletion() {
+            const sentences = document.querySelectorAll('.sentence');
+            let completed = true;
+            sentences.forEach(sentence => {
+                if (sentence.textContent.includes('______')) {
+                    completed = false;
+                }
+            });
+            if (completed) {
+                document.getElementById('feedback').textContent = "¡Felicidades! ¡Todo correcto!";
+                document.getElementById('successImage').style.display = 'block';
             }
         }
     </script>
