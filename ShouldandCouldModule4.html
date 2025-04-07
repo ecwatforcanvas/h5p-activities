@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Travel Grammar</title>
+    <style>
+        body {
+            background-color: #0d0221;
+            color: #f700ff;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px #f700ff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #f700ff;
+            box-shadow: 0 0 15px #f700ff;
+            padding: 20px;
+            background-color: rgba(13, 2, 33, 0.8);
+        }
+        h1 {
+            color: #f700ff;
+            text-align: center;
+            font-size: 2.5em;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #2a0a45;
+            border: 1px solid #f700ff;
+            margin: 20px 0;
+            position: relative;
+            height: 30px;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #f700ff;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(247, 0, 255, 0) 0%,
+                rgba(247, 0, 255, 0.8) 50%,
+                rgba(247, 0, 255, 0) 100%
+            );
+            animation: shine 2s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .question {
+            margin: 25px 0;
+            padding: 15px;
+            border-left: 3px solid #f700ff;
+            background-color: rgba(42, 10, 69, 0.5);
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #2a0a45;
+            color: #f700ff;
+            border: 1px solid #f700ff;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+        button:hover {
+            background-color: #f700ff;
+            color: #0d0221;
+            box-shadow: 0 0 10px #f700ff;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            display: none;
+            border: 1px solid #f700ff;
+        }
+        .correct {
+            background-color: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+        .incorrect {
+            background-color: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+        .hidden {
+            display: none;
+        }
+        #results {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        #restart {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GRAMMAR CHALLENGE</h1>
+        <p>Complete the sentences with SHOULD or COULD:</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div id="quiz-container"></div>
+        
+        <div id="results" class="hidden">
+            <h2>MISSION COMPLETE</h2>
+            <p>Your score: <span id="score">0</span>/10</p>
+            <button id="restart">REBOOT QUIZ</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "You ___ check the train schedule online before leaving.",
+                options: ["should", "could"],
+                answer: "should"
+            },
+            {
+                question: "We ___ take a taxi if we're running late for the airport.",
+                options: ["should", "could"],
+                answer: "could"
+            },
+            {
+                question: "Passengers ___ always keep their luggage with them.",
+                options: ["should", "could"],
+                answer: "should"
+            },
+            {
+                question: "They ___ have taken the earlier bus to avoid traffic.",
+                options: ["should", "could"],
+                answer: "could"
+            },
+            {
+                question: "She ___ download the airline's app for flight updates.",
+                options: ["should", "could"],
+                answer: "should"
+            },
+            {
+                question: "You ___ see the Eiffel Tower from your window if you get a seat on the left side.",
+                options: ["should", "could"],
+                answer: "could"
+            },
+            {
+                question: "Travelers ___ always have their passports ready at security.",
+                options: ["should", "could"],
+                answer: "should"
+            },
+            {
+                question: "We ___ have rented a car instead of taking the train.",
+                options: ["should", "could"],
+                answer: "could"
+            },
+            {
+                question: "You ___ pack some snacks for the long bus ride.",
+                options: ["should", "could"],
+                answer: "should"
+            },
+            {
+                question: "I ___ take either the 7:30 or 8:15 train to arrive on time.",
+                options: ["should", "could"],
+                answer: "could"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const quizContainer = document.getElementById('quiz-container');
+        const progressBar = document.getElementById('progress');
+        const resultsContainer = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const restartButton = document.getElementById('restart');
+
+        function displayQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            const questionHTML = `
+                <div class="question">
+                    <p>${currentQuestion + 1}. ${question.question}</p>
+                    <div class="options">
+                        ${question.options.map(option => `
+                            <button onclick="checkAnswer('${option}')">${option}</button>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback-${currentQuestion}"></div>
+                </div>
+            `;
+
+            quizContainer.innerHTML = questionHTML;
+            updateProgress();
+        }
+
+        function checkAnswer(selectedOption) {
+            const question = questions[currentQuestion];
+            const feedback = document.getElementById(`feedback-${currentQuestion}`);
+            
+            if (selectedOption === question.answer) {
+                feedback.textContent = "✓ CORRECT! " + getExplanation(question.answer);
+                feedback.className = "feedback correct";
+                score++;
+            } else {
+                feedback.textContent = "✗ INCORRECT. " + getExplanation(question.answer);
+                feedback.className = "feedback incorrect";
+            }
+            
+            feedback.style.display = "block";
+            currentQuestion++;
+            
+            setTimeout(() => {
+                displayQuestion();
+            }, 1500);
+        }
+
+        function getExplanation(answer) {
+            return answer === "should" 
+                ? "'Should' is used for advice or recommendations." 
+                : "'Could' is used for possibilities or options.";
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestion / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            scoreElement.textContent = score;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizContainer.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            displayQuestion();
+        }
+
+        restartButton.addEventListener('click', restartQuiz);
+
+        // Start the quiz
+        displayQuestion();
+    </script>
+</body>
+</html>
