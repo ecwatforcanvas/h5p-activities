@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot "Fake" - Cyberpunk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <style>
+        /* --- Paleta de Colores Cyberpunk --- */
+        :root {
+            --bg-dark: #0d0221; /* Azul/Púrpura muy oscuro */
+            --bg-medium: #261447; /* Púrpura oscuro */
+            --accent-cyan: #00f5d4;
+            --accent-pink: #ff00f5;
+            --text-light: #f0f0f0;
+            --text-dark: #1a1a1a;
+            --border-glow: 0 0 5px var(--accent-cyan), 0 0 10px var(--accent-cyan);
+        }
+
+        /* --- Estilos Generales --- */
+        body {
+            font-family: 'Orbitron', sans-serif; /* Fuente Cyberpunk */
+            background: linear-gradient(135deg, var(--bg-dark), #1a0a3d); /* Gradiente oscuro */
+            color: var(--text-light);
+        }
+
+        /* --- Contenedor Principal --- */
+        .chat-container {
+            background-color: rgba(38, 20, 71, 0.8); /* Fondo semi-transparente */
+            border: 1px solid var(--accent-cyan);
+            box-shadow: var(--border-glow);
+            backdrop-filter: blur(5px); /* Efecto cristal esmerilado */
+        }
+
+        /* --- Cabecera --- */
+        .chat-header {
+            background-color: var(--bg-medium);
+            border-bottom: 1px solid var(--accent-pink);
+            text-shadow: 0 0 5px var(--accent-pink);
+        }
+
+        /* --- Caja de Chat --- */
+        #chatbox {
+            background-color: rgba(13, 2, 33, 0.7); /* Más oscuro y transparente */
+            font-family: monospace; /* Usar monoespaciado para mostrar HTML crudo */
+            font-size: 0.8rem; /* Tamaño más pequeño para HTML */
+            overflow-x: auto; /* Permitir scroll horizontal si el HTML es ancho */
+        }
+
+        /* --- Burbujas de Chat --- */
+        .chat-bubble {
+            max-width: 90%; /* Permitir que las burbujas sean más anchas para HTML */
+            padding: 10px 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            word-wrap: break-word;
+            position: relative;
+            border: 1px solid transparent;
+            white-space: pre-wrap; /* Conservar espacios y saltos de línea del HTML crudo */
+        }
+
+        .user-bubble {
+            font-family: 'Orbitron', sans-serif; /* Volver a la fuente normal para el usuario */
+            font-size: 1rem;
+            max-width: 75%;
+            background-color: rgba(0, 245, 212, 0.15);
+            border-color: var(--accent-cyan);
+            margin-left: auto;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 3px rgba(0, 245, 212, 0.7);
+            border-bottom-right-radius: 2px;
+            white-space: normal; /* Resetear white-space para usuario */
+        }
+
+        .bot-bubble {
+            background-color: rgba(255, 0, 245, 0.15);
+            border-color: var(--accent-pink);
+            margin-right: auto;
+            color: var(--accent-pink);
+            text-shadow: 0 0 3px rgba(255, 0, 245, 0.7);
+            border-bottom-left-radius: 2px;
+        }
+        .bot-bubble.error { /* Estilo específico para mensajes de error del bot */
+             color: #ff4d4d; /* Rojo para errores */
+             border-color: #ff4d4d;
+             background-color: rgba(255, 77, 77, 0.15);
+             text-shadow: 0 0 3px rgba(255, 77, 77, 0.7);
+        }
+
+
+        /* --- Área de Entrada --- */
+        .input-area {
+            background-color: var(--bg-medium);
+            border-top: 1px solid var(--accent-cyan);
+        }
+
+        #userInput {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--accent-pink);
+            color: var(--text-light);
+            border-radius: 5px;
+            caret-color: var(--accent-cyan);
+             font-family: 'Orbitron', sans-serif; /* Asegurar fuente normal */
+             font-size: 1rem; /* Asegurar tamaño normal */
+        }
+        #userInput::placeholder {
+            color: rgba(240, 240, 240, 0.5);
+        }
+        #userInput:focus {
+            outline: none;
+            box-shadow: var(--border-glow);
+            border-color: var(--accent-cyan);
+        }
+
+        #sendButton {
+            background-color: var(--accent-pink);
+            color: var(--text-dark);
+            font-weight: 700;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--accent-pink);
+            text-shadow: none;
+        }
+        #sendButton:hover {
+            background-color: var(--accent-cyan);
+            color: var(--text-dark);
+            border-color: var(--accent-cyan);
+            box-shadow: var(--border-glow);
+        }
+
+        /* --- Scrollbar (Opcional, para navegadores Webkit) --- */
+        #chatbox::-webkit-scrollbar {
+            width: 8px;
+            height: 8px; /* Añadir altura para scroll horizontal */
+        }
+        #chatbox::-webkit-scrollbar-track {
+            background: var(--bg-medium);
+        }
+        #chatbox::-webkit-scrollbar-thumb {
+            background-color: var(--accent-pink);
+            border-radius: 4px;
+            border: 1px solid var(--bg-dark);
+        }
+        #chatbox::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-cyan);
+        }
+
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="chat-container w-full max-w-lg rounded-lg shadow-lg flex flex-col h-[80vh] overflow-hidden">
+        <div class="chat-header text-white p-4 rounded-t-lg flex items-center">
+            <h2 class="text-xl font-bold tracking-wider">CYBER_FETCH_BOT</h2>
+        </div>
+
+        <div id="chatbox" class="flex-1 p-4 overflow-y-auto">
+            <div class="chat-bubble bot-bubble">
+                <span class="font-bold">[SYSTEM]:</span> Unidad Fetch lista. Enviaré el texto HTML crudo de www.google.com (o un fallback si CORS interfiere).
+            </div>
+            </div>
+
+        <div class="input-area p-4 flex items-center rounded-b-lg">
+            <input type="text" id="userInput" class="flex-1 px-4 py-2 mr-3 focus:outline-none" placeholder="Escribe algo para iniciar fetch...">
+            <button id="sendButton" class="py-2 px-5 transition duration-300">
+                FETCH
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Elementos del DOM ---
+        const chatbox = document.getElementById('chatbox');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // --- Event Listeners ---
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // --- Funciones ---
+
+        /**
+         * Añade un mensaje a la ventana de chat.
+         * @param {string} message - El texto del mensaje.
+         * @param {string} sender - 'user' o 'bot'.
+         * @param {boolean} isError - Indica si es un mensaje de error del bot.
+         */
+        function addMessageToChatbox(message, sender, isError = false) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-bubble');
+            messageElement.classList.add(sender === 'user' ? 'user-bubble' : 'bot-bubble');
+            if (sender === 'bot' && isError) {
+                messageElement.classList.add('error'); // Añade clase de error si es necesario
+            }
+
+            // No se añade prefijo [USER]/[BOT] para la respuesta HTML cruda, solo para el mensaje inicial y errores.
+            if (sender === 'user' || isError || message.startsWith('[SYSTEM]:') || message.startsWith('[ERROR]:')) {
+                 const prefix = sender === 'user' ? '[USER]: ' : (isError ? '[ERROR]: ' : '[BOT]: ');
+                 const prefixSpan = document.createElement('span');
+                 prefixSpan.className = 'font-bold mr-1';
+                 prefixSpan.textContent = prefix;
+                 messageElement.appendChild(prefixSpan);
+                 // Quita el prefijo del mensaje si ya lo tenía para evitar duplicados
+                 message = message.replace(/^\[(SYSTEM|ERROR|BOT)\]:\s*/, '');
+            }
+
+
+            // Usamos textNode para mostrar el HTML como texto plano (más seguro)
+            messageElement.appendChild(document.createTextNode(message));
+
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        /**
+         * Envía el mensaje del usuario e intenta obtener el HTML de Google.
+         */
+        async function sendMessage() {
+            const messageText = userInput.value.trim();
+            // No necesitamos el mensaje del usuario para esta demo, pero lo mostramos
+            if (messageText !== '') {
+                 addMessageToChatbox(messageText, 'user');
+            }
+            userInput.value = ''; // Limpia input independientemente
+
+            // Indicador de "procesando..."
+            addMessageToChatbox("Iniciando fetch a www.google.com...", 'bot');
+            const thinkingBubble = chatbox.lastChild;
+
+            try {
+                // *** Intenta obtener el HTML de Google ***
+                const botResponse = await fetchGoogleContentAsReply();
+
+                chatbox.removeChild(thinkingBubble); // Elimina "Iniciando fetch..."
+                // Muestra la respuesta (HTML crudo o fallback)
+                addMessageToChatbox(botResponse, 'bot');
+
+            } catch (error) {
+                // Este catch es por si fetchGoogleContentAsReply fallara inesperadamente
+                console.error("Error inesperado en sendMessage:", error);
+                chatbox.removeChild(thinkingBubble);
+                addMessageToChatbox(`Fallo crítico en el script: ${error.message}`, 'bot', true); // Mensaje de error
+            }
+        }
+
+        /**
+         * Intenta obtener el contenido HTML de www.google.com.
+         * Debido a CORS, esto probablemente fallará en el navegador.
+         * Devuelve el HTML como texto o un mensaje de error/fallback.
+         *
+         * @returns {Promise<string>} - Una promesa que resuelve con el contenido HTML como texto o un fallback.
+         */
+        async function fetchGoogleContentAsReply() {
+            // Nota: La URL directa a Google probablemente será bloqueada por CORS.
+            // Usar un proxy CORS o un backend propio es la solución real.
+            const targetUrl = 'https://www.google.com'; // URL objetivo
+
+            // Texto HTML de fallback (muy simplificado)
+            const fallbackHtml = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Google Fallback</title></head>
+<body>
+  <h1>Contenido Fallback</h1>
+  <p>No se pudo obtener el contenido de ${targetUrl} directamente desde el navegador debido a restricciones CORS.</p>
+  <p>Esto es un texto HTML de ejemplo que se muestra en su lugar.</p>
+  <input type="text" value="Barra de búsqueda simulada">
+  <button>Buscar</button>
+</body>
+</html>`;
+
+            console.log(`Intentando fetch a: ${targetUrl}`);
+
+            try {
+                // Configura el fetch para intentar evitar CORS (aunque probablemente no funcione con Google)
+                // 'no-cors' permite hacer la solicitud pero NO permite leer la respuesta.
+                // Por lo tanto, este 'try' no obtendrá el contenido real de Google.
+                const response = await fetch(targetUrl, { mode: 'no-cors' });
+
+                // IMPORTANTE: Con mode: 'no-cors', response.ok será false, response.status será 0,
+                // y response.text() lanzará un error o devolverá vacío.
+                // No podemos leer la respuesta real de Google de esta manera.
+                console.log("Solicitud 'no-cors' enviada, pero la respuesta no es accesible desde JS.");
+
+                // Como no podemos obtener la respuesta real, devolvemos el fallback.
+                // Podrías poner aquí una llamada a tu backend si lo tuvieras.
+                return "[ERROR]: La política CORS impide leer la respuesta de " + targetUrl + ". Mostrando fallback.\n\n" + fallbackHtml;
+
+
+            } catch (error) {
+                // Este error ocurrirá si hay problemas de red o si incluso la solicitud 'no-cors' falla.
+                console.error("Error durante el fetch (posiblemente CORS o red):", error);
+                // Devolvemos el fallback como respuesta alternativa en caso de error.
+                 return "[ERROR]: Fallo al intentar conectar con " + targetUrl + " (Error: " + error.message + "). Mostrando fallback.\n\n" + fallbackHtml;
+            }
+        }
+
+    </script>
+
+</body>
+</html>
