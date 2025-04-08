@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberTrip Planner | "Be Going To"</title>
+    <style>
+        body {
+            background-color: #0a0a12;
+            color: #00f7ff;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ff00aa;
+            padding: 20px;
+            box-shadow: 0 0 20px #ff00aa80, 
+                        inset 0 0 10px #00f7ff80;
+            position: relative;
+            background: linear-gradient(135deg, #121225 0%, #1e1e3a 100%);
+        }
+        h1 {
+            text-shadow: 0 0 10px #00f7ff;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        .progress-bar {
+            height: 10px;
+            background: #1e1e3a;
+            margin: 20px 0;
+            border: 1px solid #00f7ff;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff00aa, #00f7ff);
+            transition: width 0.5s;
+            box-shadow: 0 0 10px #00f7ff80;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                        transparent, 
+                        rgba(255, 255, 255, 0.2), 
+                        transparent);
+            animation: shine 2s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        button {
+            background: #ff00aa;
+            color: #0a0a12;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #00f7ff;
+            box-shadow: 0 0 15px #00f7ff;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #00f7ff;
+            text-align: left;
+            background: rgba(10, 10, 30, 0.7);
+            display: none;
+        }
+        .prompt {
+            color: #ff00aa;
+            font-weight: bold;
+        }
+        .answer {
+            color: #00f7ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ CYBER TRIP PLANNER ⚡</h1>
+        <p>Complete the sentences with <strong>"be going to"</strong> to plan your transport:</p>
+        
+        <div id="question-container">
+            <p id="question">Loading...</p>
+            <input type="text" id="answer" placeholder="Type your answer...">
+            <button onclick="checkAnswer()">Submit</button>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        
+        <div class="result" id="result">
+            <p class="prompt" id="ai-prompt">AI Prompt:</p>
+            <p class="answer" id="ai-answer">AI Answer:</p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "I ___ take the train to Neo-Tokyo tomorrow.", a: "am going to" },
+            { q: "She ___ book a flight to CyberCity tonight.", a: "is going to" },
+            { q: "They ___ rent a hover-car for the trip.", a: "are going to" },
+            { q: "We ___ use the metro to avoid traffic.", a: "are going to" },
+            { q: "He ___ check the departure boards for delays.", a: "is going to" }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        
+        function updateQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById("question").textContent = questions[currentQuestion].q;
+                document.getElementById("answer").value = "";
+            } else {
+                endQuiz();
+            }
+        }
+        
+        function checkAnswer() {
+            const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
+            const correctAnswer = questions[currentQuestion].a.toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
+                score++;
+            }
+            
+            currentQuestion++;
+            updateProgress();
+            updateQuestion();
+        }
+        
+        function updateProgress() {
+            const progress = (currentQuestion / questions.length) * 100;
+            document.getElementById("progress").style.width = `${progress}%`;
+        }
+        
+        function endQuiz() {
+            document.getElementById("question-container").style.display = "none";
+            document.getElementById("result").style.display = "block";
+            
+            // Generate AI Prompt & Answer
+            const prompts = [
+                "Generate a tip for travelers about using 'be going to' for transport plans.",
+                "Explain how AI tools can help with future travel arrangements.",
+                "Create a short cyberpunk-style advice about checking departure boards."
+            ];
+            
+            const answers = [
+                "🚄 <strong>Pro Tip:</strong> Use 'be going to' for fixed transport plans (e.g., 'I’m going to take the 8AM train'). It shows intention + preparation. Always check for delays!",
+                "🤖 <strong>AI Assistant:</strong> Try prompts like: 'Find the cheapest flight from Neo-Tokyo to CyberCity next month' or 'Alert me if train schedules change.'",
+                "🔮 <strong>Cyber-Advice:</strong> Glowing departure boards lie. Trust them, but verify with neural apps. The 11:30 hover-bus? Probably <em>not</em> going to arrive on time."
+            ];
+            
+            const randomIndex = Math.floor(Math.random() * prompts.length);
+            document.getElementById("ai-prompt").innerHTML = `📡 <strong>Prompt to AI Tool:</strong> "${prompts[randomIndex]}"`;
+            document.getElementById("ai-answer").innerHTML = `⚡ <strong>AI Response:</strong> ${answers[randomIndex]}`;
+        }
+        
+        // Initialize
+        updateQuestion();
+    </script>
+</body>
+</html>
