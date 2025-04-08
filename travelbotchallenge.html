@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberTrip Planner | "Be Going To"</title>
+    <title>CyberTrip Planner | "Be Going To" + AI</title>
     <style>
         body {
             background-color: #0a0a12;
@@ -84,12 +84,24 @@
             background: rgba(10, 10, 30, 0.7);
             display: none;
         }
-        .prompt {
+        .prompt-box {
             color: #ff00aa;
             font-weight: bold;
+            margin-bottom: 10px;
         }
-        .answer {
-            color: #00f7ff;
+        textarea {
+            width: 100%;
+            background: #121225;
+            border: 1px solid #00f7ff;
+            color: white;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        .copy-btn {
+            background: #00f7ff;
+            color: #0a0a12;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -109,8 +121,15 @@
         </div>
         
         <div class="result" id="result">
-            <p class="prompt" id="ai-prompt">AI Prompt:</p>
-            <p class="answer" id="ai-answer">AI Answer:</p>
+            <div class="prompt-box">
+                📡 <strong>Prompt to ask ChatGPT:</strong>
+                <p id="ai-prompt"></p>
+                <button onclick="copyPrompt()" class="copy-btn">Copy Prompt</button>
+            </div>
+            <div>
+                ✨ <strong>Paste ChatGPT's Answer Here:</strong>
+                <textarea id="ai-answer" placeholder="Paste AI's response after asking ChatGPT..."></textarea>
+            </div>
         </div>
     </div>
 
@@ -124,7 +143,6 @@
         ];
         
         let currentQuestion = 0;
-        let score = 0;
         
         function updateQuestion() {
             if (currentQuestion < questions.length) {
@@ -136,13 +154,6 @@
         }
         
         function checkAnswer() {
-            const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
-            const correctAnswer = questions[currentQuestion].a.toLowerCase();
-            
-            if (userAnswer === correctAnswer) {
-                score++;
-            }
-            
             currentQuestion++;
             updateProgress();
             updateQuestion();
@@ -157,22 +168,21 @@
             document.getElementById("question-container").style.display = "none";
             document.getElementById("result").style.display = "block";
             
-            // Generate AI Prompt & Answer
+            // Generate a practical AI prompt about transportation
             const prompts = [
-                "Generate a tip for travelers about using 'be going to' for transport plans.",
-                "Explain how AI tools can help with future travel arrangements.",
-                "Create a short cyberpunk-style advice about checking departure boards."
+                "Give me 5 tips for using 'be going to' when planning travel arrangements.",
+                "Explain how to check flight departure boards efficiently, using future tense.",
+                "List 3 common transportation problems and how to avoid them (use 'be going to' in examples)."
             ];
             
-            const answers = [
-                "🚄 <strong>Pro Tip:</strong> Use 'be going to' for fixed transport plans (e.g., 'I’m going to take the 8AM train'). It shows intention + preparation. Always check for delays!",
-                "🤖 <strong>AI Assistant:</strong> Try prompts like: 'Find the cheapest flight from Neo-Tokyo to CyberCity next month' or 'Alert me if train schedules change.'",
-                "🔮 <strong>Cyber-Advice:</strong> Glowing departure boards lie. Trust them, but verify with neural apps. The 11:30 hover-bus? Probably <em>not</em> going to arrive on time."
-            ];
-            
-            const randomIndex = Math.floor(Math.random() * prompts.length);
-            document.getElementById("ai-prompt").innerHTML = `📡 <strong>Prompt to AI Tool:</strong> "${prompts[randomIndex]}"`;
-            document.getElementById("ai-answer").innerHTML = `⚡ <strong>AI Response:</strong> ${answers[randomIndex]}`;
+            const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            document.getElementById("ai-prompt").textContent = randomPrompt;
+        }
+        
+        function copyPrompt() {
+            const promptText = document.getElementById("ai-prompt").textContent;
+            navigator.clipboard.writeText(promptText);
+            alert("Prompt copied! Ask ChatGPT now.");
         }
         
         // Initialize
