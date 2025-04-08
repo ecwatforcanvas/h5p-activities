@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Prompt Interface</title>
+    <title>Prompts de Vuelo IA Futuristas</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -11,176 +11,188 @@
             font-family: 'Inter', sans-serif;
             background-color: #111827; /* Dark background */
             color: #f9fafb; /* Light text */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: start;
-            min-height: 100vh;
             margin: 0;
             padding: 20px;
         }
-        #prompt-container {
-            width: 95%;
-            max-width: 800px; /* Increased max-width for larger screens */
-            background-color: rgba(255, 255, 255, 0.05); /* Glassmorphism effect - more subtle*/
+        .container {
+            max-width: 800px; /* Increased max-width */
+            margin: 0 auto;
+            padding: 24px; /* Increased padding */
+            background-color: rgba(255, 255, 255, 0.05); /* Glassmorphism effect */
             border-radius: 16px; /* More rounded corners */
-            padding: 24px;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25); /* Slightly stronger shadow */
-            backdrop-filter: blur(12px); /* Slightly more blur */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* тонкая обводка */
-            margin-top: 30px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25); /* Stronger shadow */
+            backdrop-filter: blur(12px); /* More blur */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Thin border */
         }
-
-        .prompt-item {
-            background-color: rgba(255, 255, 255, 0.08); /* Glassmorphism for prompt items */
-            border-radius: 12px; /* More rounded corners */
-            padding: 18px; /* Slightly increased padding */
-            margin-bottom: 16px; /* Increased margin */
-            border: 1px solid rgba(255, 255, 255, 0.05); /* Thin border */
-            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition */
-            cursor: pointer;
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #ffffff;
+            text-align: center;
+            /*background-image: linear-gradient(to right, #6ee7b7, #3b82f6); !* Gradient from teal to blue *!
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;*/
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3); /* Slightly more pronounced text shadow */
+        }
+        .collapsible-menu {
+            margin-bottom: 24px; /* Increased margin */
+        }
+        .collapsible-header {
             display: flex; /* Use flexbox for layout */
-            justify-content: space-between; /* Space between prompt and copy button */
+            justify-content: space-between; /* Space between title and icon */
+            align-items: center; /* Vertically center items */
+            background-color: rgba(255, 255, 255, 0.08); /* Glassmorphism for header */
+            color: #ffffff;
+            padding: 18px; /* Increased padding */
+            border-radius: 12px; /* More rounded corners */
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Thin border */
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+            font-size: 20px; /* Larger font size */
+            font-weight: 600; /* Semi-bold font */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
+        }
+        .collapsible-header:hover {
+            background-color: rgba(255, 255, 255, 0.15); /* Lighter hover effect */
+            border-color: rgba(255, 255, 255, 0.2); /* Slightly brighter border */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+            transform: translateY(-2px) scale(1.02); /* Slight lift and scale */
+        }
+        .collapsible-header::after {
+            content: '+'; /* Plus icon */
+            font-size: 24px; /* Larger icon */
+            color: #ffffff;
+            transition: transform 0.3s ease; /* Smooth transition for rotation */
+            font-weight: 600; /* Make the plus bolder */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Add a subtle shadow to the icon */
+        }
+        .collapsible-header.active::after {
+            transform: rotate(45deg); /* Rotate plus icon to X when active */
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.5s ease; /* Smooth transition */
+            background-color: rgba(255, 255, 255, 0.05); /* Glassmorphism for content */
+            border-radius: 12px; /* More rounded corners */
+            margin-top: -12px; /* Overlap header slightly */
+            border-left: 1px solid rgba(255, 255, 255, 0.1); /* тонкая обводка */
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .collapsible-content.active {
+            max-height: 500px; /* Increased max-height */
+            padding: 18px; /* Increased padding */
+            margin-top: 0; /* Remove negative margin when active */
+        }
+        .prompt-item {
+            padding: 18px; /* Increased padding */
+            margin-bottom: 16px; /* Increased margin */
+            border-radius: 12px; /* More rounded corners */
+            background-color: rgba(255, 255, 255, 0.08); /* Glassmorphism for prompt items */
+            border: 1px solid rgba(255, 255, 255, 0.05); /* Thin border */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition */
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Space between text and copy button */
             align-items: center; /* Vertically center items */
         }
-
         .prompt-item:hover {
-            transform: translateY(-4px) scale(1.02); /* Slight lift and scale on hover */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Increased shadow on hover */
-            border-color: rgba(255, 255, 255, 0.2);  /* একটু বর্ডার */
+            background-color: rgba(255, 255, 255, 0.15); /* Lighter hover effect */
+            transform: translateY(-2px) scale(1.01); /* Slight lift and scale on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
         }
-
         .prompt-text {
-            font-size: 18px; /* Increased font size */
+            font-size: 18px; /* Larger font size */
             color: #ffffff;
-            margin-right: 12px; /* Space between text and button */
+            margin-right: 16px; /* Increased margin */
             flex: 1; /* Allow text to take up available space */
             word-wrap: break-word; /* Ensure long prompts don't overflow */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Subtle text shadow */
         }
-
-        .copy-button {
-            background-color: rgba(0, 247, 255, 0.15); /* Vibrant cyan, more transparent */
-            color: #00f7ff;
-            border: none;
-            padding: 8px 16px; /* Slightly adjusted button padding */
-            border-radius: 8px; /* More rounded button */
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-            font-family: 'Inter', sans-serif;
-            font-weight: 600; /* Semi-bold font */
-            display: inline-flex; /* Use inline-flex for icon alignment */
-            align-items: center;
-            gap: 6px; /* Space between icon and text */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-        }
-
-        .copy-button:hover {
-            background-color: rgba(0, 247, 255, 0.3); /* Slightly less transparent on hover */
-            color: #000000; /* Change text color on hover */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Increased shadow on hover */
-        }
-
-        .copy-button:active {
-            background-color: rgba(0, 247, 255, 0.5); /* Even less transparent on active */
-            color: #000000;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Smaller shadow on active */
-            transform: translateY(1px); /* Push down slightly on active */
-        }
-
-        .icon {
-            width: 20px; /* Increased icon size */
-            height: 20px;
-            /* Use an SVG icon directly in the CSS background for more customization */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300f7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-copy'%3E%3Crect width='14' height='14' x='8' y='8' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v2'%3E%3C/path%3E%3C/svg%3E");
-            background-size: cover;
-            display: inline-block; /* Ensure the icon behaves like an inline element */
-        }
-
 
     </style>
 </head>
 <body class="bg-gray-900 text-gray-50">
-    <div id="prompt-container" class="rounded-lg shadow-md">
-        <h1 class="text-2xl font-semibold mb-6 text-white text-center bg-gradient-to-r from-cyan-400 to-pink-500 text-transparent bg-clip-text">
-            Flight Prompts
-        </h1>
-        <ul id="prompt-list">
-            </ul>
+    <div class="container">
+        <div id="collapsible-list">
+            </div>
+        <h2 class="title mt-8 text-center">Usar estos prompts en el simulador o en una AI tool real</h2>
     </div>
-
     <script>
         const promptData = [
-            { prompt: "Should I book my flight in advance?" },
-            { prompt: "Could I change my flight after booking?" },
-            { prompt: "Should I arrive early for my flight?" },
-            { prompt: "Could I get a refund if my flight is canceled?" },
-            { prompt: "Should I check the departure board at the airport?" },
-            { prompt: "Could I book a hotel along with my flight?" },
-            { prompt: "Should I print my boarding pass or is a digital one enough?" },
-            { prompt: "Could I bring extra luggage if I pay for it?" },
-            { prompt: "Should I buy travel insurance for my flight?" },
-            { prompt: "Could I select my seat when booking a flight?" },
-            { prompt: "Should I check in online before my flight?" },
-            { prompt: "Could I find last-minute flight deals?" },
-            { prompt: "Should I notify the airline about my dietary restrictions?" },
-            { prompt: "Could I use public transportation to get to the airport?" },
-            { prompt: "Should I bring a passport for a domestic flight?" },
-            { prompt: "Could I track my flight’s status in real time?" },
-            { prompt: "Should I book a taxi from the airport in advance?" },
-            { prompt: "Could I travel with a pet on my flight?" },
-            { prompt: "Should I exchange currency before flying?" },
-            { prompt: "Could I rebook my flight if I miss it?" },
-            { prompt: "Should I pack essential medicines in my carry-on?" },
-            { prompt: "Could I find Wi-Fi at the airport?" },
-            { prompt: "Should I confirm my flight the day before?" },
-            { prompt: "Could I bring food through airport security?" },
-            { prompt: "Should I book a rental car before arriving?" },
-            { prompt: "Could I check baggage for a connecting flight?" },
-            { prompt: "Should I tip airport or taxi staff?" },
-            { prompt: "Could I sleep at the airport overnight?" },
-            { prompt: "Should I download offline maps before traveling?" },
-            { prompt: "Could I claim compensation for a delayed flight?" },
+            [
+                { prompt: "Initiate pre-flight sequence." },
+                { prompt: "Optimize flight path for minimal turbulence." },
+                { prompt: "Calibrate neural interface with flight systems." },
+                { prompt: "Diagnose potential engine anomalies." },
+                { prompt: "Establish secure comms with air traffic control." },
+                { prompt: "Deploy anti-grav stabilizers." },
+                { prompt: "Analyze weather patterns for optimal flight conditions." },
+                { prompt: "Activate emergency protocols." },
+                { prompt: "Monitor passenger vitals." },
+                { prompt: "Prepare for quantum jump." },
+            ],
+            [
+                { prompt: "Predict arrival time with 99% accuracy." },
+                { prompt: "Generate holographic flight map." },
+                { prompt: "Translate pilot commands into binary code." },
+                { prompt: "Authenticate pilot identity via retinal scan." },
+                { prompt: "Engage cloaking device." },
+                { prompt: "Calculate fuel consumption rate." },
+                { prompt: "Optimize cabin pressure." },
+                { prompt: "Run diagnostics on life support systems." },
+                { prompt: "Prepare landing gear for touchdown." },
+                { prompt: "Initiate post-flight shutdown sequence." },
+            ],
+            [
+                { prompt: "Scan for unauthorized drones in airspace." },
+                { prompt: "Deploy countermeasures against cyberattacks." },
+                { prompt: "Analyze pilot stress levels." },
+                { prompt: "Predict potential mechanical failures." },
+                { prompt: "Optimize energy distribution throughout aircraft." },
+                { prompt: "Generate alternative flight routes in case of emergency." },
+                { prompt: "Monitor structural integrity of aircraft." },
+                { prompt: "Prepare for unexpected spatial anomalies." },
+                { prompt: "Initiate passenger evacuation procedures." },
+                { prompt: "Transmit black box data to central server." },
+            ],
         ];
 
-        const promptList = document.getElementById('prompt-list');
+        const collapsibleList = document.getElementById('collapsible-list');
 
-        promptData.forEach(item => {
-            const listItem = document.createElement('li');
-            listItem.className = 'prompt-item';
+        promptData.forEach((group, index) => {
+            const collapsibleMenu = document.createElement('div');
+            collapsibleMenu.className = 'collapsible-menu';
 
-            const promptTextSpan = document.createElement('span');
-            promptTextSpan.className = 'prompt-text';
-            promptTextSpan.textContent = item.prompt;
-
-            const copyButton = document.createElement('button');
-            copyButton.className = 'copy-button';
-            copyButton.textContent = 'Copy';
-
-            const iconSpan = document.createElement('span');
-            iconSpan.className = 'icon';  // Adds the icon class
-
-            copyButton.prepend(iconSpan); // Insert the icon before the text
-
-            copyButton.addEventListener('click', () => {
-                navigator.clipboard.writeText(item.prompt).then(() => {
-                    copyButton.textContent = 'Copied!';
-                    copyButton.classList.add('bg-green-500', 'text-white'); //change color
-                    setTimeout(() => {
-                        copyButton.textContent = 'Copy'; //change text
-                        copyButton.classList.remove('bg-green-500', 'text-white');
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
-                    copyButton.textContent = 'Error';
-                     setTimeout(() => {
-                        copyButton.textContent = 'Copy';
-                    }, 2000);
-                });
+            const header = document.createElement('div');
+            header.className = 'collapsible-header';
+            header.textContent = `Vuelo IA Prompts ${index + 1}`;
+            header.addEventListener('click', () => {
+                header.classList.toggle('active');
+                content.classList.toggle('active');
             });
 
-            listItem.appendChild(promptTextSpan);
-            listItem.appendChild(copyButton);
-            promptList.appendChild(listItem);
+            const content = document.createElement('div');
+            content.className = 'collapsible-content';
+
+            group.forEach(item => {
+                const promptItem = document.createElement('div');
+                promptItem.className = 'prompt-item';
+
+                const promptTextSpan = document.createElement('span');
+                promptTextSpan.className = 'prompt-text';
+                promptTextSpan.textContent = item.prompt;
+
+
+                promptItem.appendChild(promptTextSpan);
+                content.appendChild(promptItem);
+            });
+
+            collapsibleMenu.appendChild(header);
+            collapsibleMenu.appendChild(content);
+            collapsibleList.appendChild(collapsibleMenu);
         });
     </script>
 </body>
