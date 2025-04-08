@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Simulado - Cyberpunk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <style>
+        /* --- Paleta de Colores Cyberpunk --- */
+        :root {
+            --bg-dark: #0d0221;
+            --bg-medium: #261447;
+            --accent-cyan: #00f5d4;
+            --accent-pink: #ff00f5;
+            --text-light: #f0f0f0;
+            --text-dark: #1a1a1a;
+            --border-glow: 0 0 10px var(--accent-cyan); /* Más intenso */
+            --metallic-glow: 0 0 5px #fff, 0 0 10px var(--accent-cyan), 0 0 15px #fff; /* Efecto metálico */
+        }
+
+        /* --- Estilos Generales --- */
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0a3d);
+            color: var(--text-light);
+        }
+
+        /* --- Contenedor Principal --- */
+        .chat-container {
+            background-color: rgba(38, 20, 71, 0.8);
+            border: 1px solid var(--accent-cyan);
+            box-shadow: var(--border-glow); /* Aplica el glow */
+            backdrop-filter: blur(5px);
+            max-width: 90%; /* Más ancho */
+            margin: 0 auto; /* Centrar si es necesario */
+        }
+
+        /* --- Cabecera --- */
+        .chat-header {
+            background-color: var(--bg-medium);
+            border-bottom: 1px solid var(--accent-pink);
+            text-shadow: 0 0 5px var(--accent-pink);
+        }
+
+        /* --- Caja de Chat --- */
+        #chatbox {
+            background-color: rgba(13, 2, 33, 0.7);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            overflow-x: hidden;
+        }
+
+        /* --- Burbujas de Chat --- */
+        .chat-bubble {
+            max-width: 75%;
+            padding: 12px 18px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            word-wrap: break-word;
+            position: relative;
+            border: 1px solid transparent;
+            white-space: normal;
+            box-shadow: var(--metallic-glow); /* Aplica el efecto metálico a las burbujas */
+        }
+
+        .user-bubble {
+            background-color: rgba(0, 245, 212, 0.15);
+            border-color: var(--accent-cyan);
+            margin-left: auto;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 3px rgba(0, 245, 212, 0.7);
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-bubble {
+            background-color: rgba(255, 0, 245, 0.15);
+            border-color: var(--accent-pink);
+            margin-right: auto;
+            color: var(--accent-pink);
+            text-shadow: 0 0 3px rgba(255, 0, 245, 0.7);
+            border-bottom-left-radius: 2px;
+        }
+        .bot-bubble.error {
+            color: #ff4d4d;
+            border-color: #ff4d4d;
+            background-color: rgba(255, 77, 77, 0.15);
+            text-shadow: 0 0 3px rgba(255, 77, 77, 0.7);
+        }
+
+        /* --- Área de Entrada --- */
+        .input-area {
+            background-color: var(--bg-medium);
+            border-top: 1px solid var(--accent-cyan);
+        }
+
+        #userInput {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--accent-pink);
+            color: var(--text-light);
+            border-radius: 5px;
+            caret-color: var(--accent-cyan);
+            width: calc(100% - 120px); /* Ajusta el ancho para el botón */
+        }
+        #userInput::placeholder {
+            color: rgba(240, 240, 240, 0.5);
+        }
+        #userInput:focus {
+            outline: none;
+            box-shadow: var(--border-glow);
+            border-color: var(--accent-cyan);
+        }
+
+        #sendButton {
+            background-color: var(--accent-pink);
+            color: var(--text-dark);
+            font-weight: 700;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--accent-pink);
+            text-shadow: none;
+            box-shadow: var(--metallic-glow); /* Aplica el efecto metálico al botón */
+        }
+        #sendButton:hover {
+            background-color: var(--accent-cyan);
+            color: var(--text-dark);
+            border-color: var(--accent-cyan);
+            box-shadow: var(--border-glow);
+        }
+
+        /* --- Scrollbar (Opcional, para navegadores Webkit) --- */
+        #chatbox::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chatbox::-webkit-scrollbar-track {
+            background: var(--bg-medium);
+        }
+        #chatbox::-webkit-scrollbar-thumb {
+            background-color: var(--accent-pink);
+            border-radius: 4px;
+            border: 1px solid var(--bg-dark);
+        }
+        #chatbox::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-cyan);
+        }
+
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="chat-container rounded-lg shadow-lg flex flex-col h-[80vh] overflow-hidden">
+        <div class="chat-header text-white p-4 rounded-t-lg flex items-center">
+            <h2 class="text-xl font-bold tracking-wider">SIMULADOR_CYBER_TUTOR</h2>
+        </div>
+
+        <div id="chatbox" class="flex-1 p-4 overflow-y-auto">
+            <div class="chat-bubble bot-bubble">
+                <span class="font-bold">[SYSTEM]:</span> Simulador activado. Ingresa un prompt de la lista de tu curso (ej: 'saludo', 'present simple', 'past simple').
+            </div>
+        </div>
+
+        <div class="input-area p-4 flex items-center rounded-b-lg">
+            <input type="text" id="userInput" class="px-4 py-2 mr-3 focus:outline-none" placeholder="Ingresa prompt aquí...">
+            <button id="sendButton" class="py-2 px-5 transition duration-300">
+                ENVIAR
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Elementos del DOM ---
+        const chatbox = document.getElementById('chatbox');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // --- Event Listeners ---
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // --- Funciones ---
+
+        /**
+         * Añade un mensaje a la ventana de chat.
+         * @param {string} message - El texto del mensaje.
+         * @param {string} sender - 'user' o 'bot'.
+         * @param {boolean} isError - Indica si es un mensaje de error del bot.
+         */
+        function addMessageToChatbox(message, sender, isError = false) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-bubble');
+            messageElement.classList.add(sender === 'user' ? 'user-bubble' : 'bot-bubble');
+            if (sender === 'bot' && isError) {
+                messageElement.classList.add('error');
+            }
+
+            // Añadir prefijo para claridad
+            const prefix = sender === 'user' ? '[USER]: ' : (isError ? '[ERROR]: ' : '[BOT_SIM]: ');
+            const prefixSpan = document.createElement('span');
+            prefixSpan.className = 'font-bold mr-1';
+            prefixSpan.textContent = prefix;
+
+            messageElement.appendChild(prefixSpan);
+             // Quita el prefijo del mensaje si ya lo tenía para evitar duplicados
+            message = message.replace(/^\[(SYSTEM|ERROR|BOT_SIM)\]:\s*/, '');
+            messageElement.appendChild(document.createTextNode(message));
+
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        /**
+         * Envía el mensaje del usuario y obtiene una respuesta predefinida.
+         */
+        async function sendMessage() {
+            const messageText = userInput.value.trim();
+            if (messageText === '') return;
+
+            addMessageToChatbox(messageText, 'user');
+            userInput.value = '';
+
+            // Indicador de "procesando..." simulado
+            addMessageToChatbox("Processing prompt...", 'bot'); // En inglés
+            const thinkingBubble = chatbox.lastChild;
+
+            try {
+                const botResponse = await getPredefinedResponse(messageText);
+
+                // Espera un poquito más para que se vea el "Procesando..."
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                chatbox.removeChild(thinkingBubble);
+                addMessageToChatbox(botResponse, 'bot');
+
+            } catch (error) {
+                console.error("Unexpected error in script:", error);
+                chatbox.removeChild(thinkingBubble);
+                addMessageToChatbox(`Internal script failure: ${error.message}`, 'bot', true); // En inglés
+            }
+        }
+
+        /**
+         * Devuelve una respuesta predefinida basada en el mensaje del usuario.
+         *
+         * @param {string} userMessage - El mensaje/prompt ingresado por el usuario.
+         * @returns {Promise<string>} - Una promesa que resuelve con la respuesta predefinida.
+         */
+        function getPredefinedResponse(userMessage) {
+            const lowerCaseMessage = userMessage.toLowerCase().trim();
+
+            // --- ¡DEFINE AQUÍ TUS PROMPTS Y RESPUESTAS! ---
+             let response = "[SIM] Command not recognized. Check the list of prompts for your course. Try 'hello', 'present simple', 'past simple'."; // Respuesta por defecto en inglés
+
+            if (lowerCaseMessage.includes("hola") || lowerCaseMessage.includes("saludo") || lowerCaseMessage.includes("hello")) {
+                response = "[SIM] Hello! Welcome to the Cyber Tutor simulator. I'm ready to answer your prompts about English grammar. Try 'present simple' or 'past simple'."; // En inglés
+            }
+            else if (lowerCaseMessage.includes("present simple")) {
+                response = "[SIM] The 'Present Simple' is used for habits, routines, and general facts. Affirmative structure: Subject + Verb (add -s/-es for he/she/it). Example: 'She works from home.' // 'They live in Zaragoza.'"; // En inglés
+            }
+             else if (lowerCaseMessage.includes("ejemplo pregunta present simple")) {
+                response = "[SIM] Present Simple Question: Do/Does + Subject + Verb (base)? Example: 'Do you speak English?' // 'Does he play the guitar?'";
+            }
+            else if (lowerCaseMessage.includes("past simple")) {
+                response = "[SIM] The 'Past Simple' describes actions completed in the past. Regular verbs: add -ed. Irregular verbs: you have to memorize them! Example: 'I watched a movie.' (regular) // 'She went to the party.' (irregular)"; // En inglés
+            }
+             else if (lowerCaseMessage.includes("negativa past simple")) {
+                response = "[SIM] Past Simple Negative: Subject + did not (didn't) + Verb (base). Example: 'I didn't watch TV.' // 'He didn't go to the party.'";
+            }
+            else if (lowerCaseMessage.includes("adiós") || lowerCaseMessage.includes("bye") || lowerCaseMessage.includes("exit")) {
+                response = "[SIM] Disconnecting simulator. Keep practicing your English!"; // En inglés
+            }
+            // --- Nuevos prompts de vuelos ---
+            else if (lowerCaseMessage.includes("should i book my flight in advance?")) {
+                response = "[SIM] Yes, booking in advance usually gives you better prices and more options. Airlines often increase fares as the departure date gets closer. I recommend booking at least 3-4 weeks ahead for domestic flights and 2-3 months for international ones.";
+            } else if (lowerCaseMessage.includes("could i change my flight after booking?")) {
+                response = "[SIM] Most airlines allow flight changes, but fees may apply depending on your ticket type. Check your airline's policy or contact customer service. Some flexible tickets offer free changes within a certain period.";
+            } else if (lowerCaseMessage.includes("should i arrive early for my flight?")) {
+                response = "[SIM] Yes! For domestic flights, arrive at least 2 hours before departure, and for international flights, 3 hours is recommended. This allows time for check-in, security checks, and unexpected delays.";
+            } else if (lowerCaseMessage.includes("could i get a refund if my flight is canceled?")) {
+                response = "[SIM] Yes, if the airline cancels your flight, you’re usually entitled to a refund or rebooking. Some airlines may also offer compensation depending on the circumstances and local regulations.";
+            } else if (lowerCaseMessage.includes("should i check the departure board at the airport?")) {
+                response = "[SIM] Absolutely! Departure boards display real-time updates on gate changes, delays, and cancellations. Always verify your flight status before heading to the gate.";
+            } else if (lowerCaseMessage.includes("could i book a hotel along with my flight?")) {
+                response = "[SIM] Yes, many travel websites and airlines offer package deals for flights + hotels, which can save you money. Would you like me to help you find one?";
+            } else if (lowerCaseMessage.includes("should i print my boarding pass or is a digital one enough?")) {
+                response = "[SIM] Most airlines accept digital boarding passes on your phone, but it’s a good idea to have a backup (printed or saved as PDF) in case of technical issues.";
+            } else if (lowerCaseMessage.includes("could i bring extra luggage if i pay for it?")) {
+                response = "[SIM] Yes, airlines usually allow extra baggage for an additional fee. Check their website for pricing and weight limits to avoid surprises at the airport.";
+            } else if (lowerCaseMessage.includes("should i buy travel insurance for my flight?")) {
+                response = "[SIM] It’s highly recommended, especially for international trips. Travel insurance can cover cancellations, medical emergencies, and lost luggage. Better safe than sorry!";
+            } else if (lowerCaseMessage.includes("could i select my seat when booking a flight?")) {
+                response = "[SIM] Yes, most airlines let you choose your seat during booking, sometimes for an extra fee. Window, aisle, or emergency exit seats may have different costs.";
+            } else if (lowerCaseMessage.includes("should i check in online before my flight?")) {
+                response = "[SIM] Definitely! Online check-in (usually 24-48 hours before departure) saves time at the airport and ensures you get your preferred seat.";
+            } else if (lowerCaseMessage.includes("could i find last-minute flight deals?")) {
+                response = "[SIM] Sometimes! Airlines may discount unsold seats close to departure. Check budget airlines or last-minute deal websites, but availability isn’t guaranteed.";
+            } else if (lowerCaseMessage.includes("should i notify the airline about my dietary restrictions?")) {
+                response = "[SIM] Yes, inform the airline at least 48 hours before your flight if you need a special meal (vegetarian, gluten-free, etc.). Most airlines offer options if requested in advance.";
+            } else if (lowerCaseMessage.includes("could i use public transportation to get to the airport?")) {
+                response = "[SIM] Yes, many airports have train, bus, or metro connections. Check schedules in advance, as some services may not run late at night or early in the morning.";
+            } else if (lowerCaseMessage.includes("should i bring a passport for a domestic flight?")) {
+                response = "[SIM] It depends on the country. Some require a passport, while others accept a national ID card. Always check your local regulations before traveling.";
+            } else if (lowerCaseMessage.includes("could i track my flight’s status in real time?")) {
+                response = "[SIM] Yes! Use airline apps, flight tracking websites (like FlightAware), or airport departure boards to monitor delays or gate changes.";
+            } else if (lowerCaseMessage.includes("should i book a taxi from the airport in advance?")) {
+                response = "[SIM] It’s a good idea, especially if you arrive late or in an unfamiliar city. Apps like Uber or local taxi services often let you pre-book rides.";
+            } else if (lowerCaseMessage.includes("could i travel with a pet on my flight?")) {
+                response = "[SIM] Most airlines allow pets, but rules vary (size, carrier requirements, fees). Contact the airline in advance to arrange this and check quarantine laws if traveling internationally.";
+            } else if (lowerCaseMessage.includes("should i exchange currency before flying?")) {
+                response = "[SIM] It’s wise to have some local cash, but airports often have high exchange fees. Consider withdrawing money at an ATM upon arrival or using a travel card.";
+            } else if (lowerCaseMessage.includes("could i rebook my flight if i miss it?")) {
+                response = "[SIM] Yes, but fees may apply. Contact the airline immediately—sometimes they can put you on the next available flight for a lower cost if it’s not your fault.";
+            } else if (lowerCaseMessage.includes("should i pack essential medicines in my carry-on?")) {
+                response = "[SIM] Absolutely! Always keep medications in your hand luggage in case checked bags are delayed. Bring prescriptions if required.";
+            } else if (lowerCaseMessage.includes("could i find wi-fi at the airport?")) {
+                response = "[SIM] Most airports offer free Wi-Fi, though some may limit usage time or require registration. Premium high-speed Wi-Fi is often available for purchase.";
+            } else if (lowerCaseMessage.includes("should i confirm my flight the day before?")) {
+                response = "[SIM] Yes! Airlines sometimes change schedules last-minute. A quick online check or app notification can save you from surprises.";
+            } else if (lowerCaseMessage.includes("could i bring food through airport security?")) {
+                response = "[SIM] Solid food is usually allowed, but liquids (like sauces or yogurt) must follow the 100ml liquid rule. Check your airport’s guidelines to be sure.";
+            } else if (lowerCaseMessage.includes("should i book a rental car before arriving?")) {
+                response = "[SIM] Yes, pre-booking often gives better rates and guarantees availability. Compare prices online and check fuel policies before confirming.";
+            } else if (lowerCaseMessage.includes("could i check baggage for a connecting flight?")) {
+                response = "[SIM] If flights are on the same ticket, bags are usually transferred automatically. If booked separately, you may need to collect and recheck them.";
+            } else if (lowerCaseMessage.includes("should i tip airport or taxi staff?")) {
+                response = "[SIM] Customs vary by country. In the U.S., tipping taxi drivers is expected (15-20%). In some Asian countries, it’s not customary. Research your destination’s norms.";
+            } else if (lowerCaseMessage.includes("could i sleep at the airport overnight?")) {
+                response = "[SIM] Many airports allow it, but comfort varies. Some have sleeping pods or lounges for rent. Check if your airport is sleep-friendly before planning this.";
+            } else if (lowerCaseMessage.includes("should i download offline maps before traveling?")) {
+                response = "[SIM] Yes! Offline maps (Google Maps, Maps.me) are lifesavers if you don’t have data abroad. Download your destination’s map while on Wi-Fi.";
+            } else if (lowerCaseMessage.includes("could i claim compensation for a delayed flight?")) {
+                response = "[SIM] In many countries (like the EU), delays over 3 hours may entitle you to compensation. Check your airline’s policy or websites like AirHelp to file a claim.";
+            }
+
+            // Simula un pequeño retraso
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(response);
+                }, 600);
+            });
+        }
+
+    </script>
+
+</body>
+</html>

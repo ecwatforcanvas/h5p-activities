@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Prompt Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark background */
+            color: #f9fafb; /* Light text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        #prompt-container {
+            width: 95%;
+            max-width: 800px; /* Increased max-width for larger screens */
+            background-color: rgba(255, 255, 255, 0.05); /* Glassmorphism effect - more subtle*/
+            border-radius: 16px; /* More rounded corners */
+            padding: 24px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25); /* Slightly stronger shadow */
+            backdrop-filter: blur(12px); /* Slightly more blur */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* тонкая обводка */
+            margin-top: 30px;
+        }
+
+        .prompt-item {
+            background-color: rgba(255, 255, 255, 0.08); /* Glassmorphism for prompt items */
+            border-radius: 12px; /* More rounded corners */
+            padding: 18px; /* Slightly increased padding */
+            margin-bottom: 16px; /* Increased margin */
+            border: 1px solid rgba(255, 255, 255, 0.05); /* Thin border */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition */
+            cursor: pointer;
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Space between prompt and copy button */
+            align-items: center; /* Vertically center items */
+        }
+
+        .prompt-item:hover {
+            transform: translateY(-4px) scale(1.02); /* Slight lift and scale on hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Increased shadow on hover */
+            border-color: rgba(255, 255, 255, 0.2);  /* একটু বর্ডার */
+        }
+
+        .prompt-text {
+            font-size: 18px; /* Increased font size */
+            color: #ffffff;
+            margin-right: 12px; /* Space between text and button */
+            flex: 1; /* Allow text to take up available space */
+            word-wrap: break-word; /* Ensure long prompts don't overflow */
+        }
+
+        .copy-button {
+            background-color: rgba(0, 247, 255, 0.15); /* Vibrant cyan, more transparent */
+            color: #00f7ff;
+            border: none;
+            padding: 8px 16px; /* Slightly adjusted button padding */
+            border-radius: 8px; /* More rounded button */
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+            font-family: 'Inter', sans-serif;
+            font-weight: 600; /* Semi-bold font */
+            display: inline-flex; /* Use inline-flex for icon alignment */
+            align-items: center;
+            gap: 6px; /* Space between icon and text */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+
+        .copy-button:hover {
+            background-color: rgba(0, 247, 255, 0.3); /* Slightly less transparent on hover */
+            color: #000000; /* Change text color on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Increased shadow on hover */
+        }
+
+        .copy-button:active {
+            background-color: rgba(0, 247, 255, 0.5); /* Even less transparent on active */
+            color: #000000;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Smaller shadow on active */
+            transform: translateY(1px); /* Push down slightly on active */
+        }
+
+        .icon {
+            width: 20px; /* Increased icon size */
+            height: 20px;
+            /* Use an SVG icon directly in the CSS background for more customization */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300f7ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-copy'%3E%3Crect width='14' height='14' x='8' y='8' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v2'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+            display: inline-block; /* Ensure the icon behaves like an inline element */
+        }
+
+
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-50">
+    <div id="prompt-container" class="rounded-lg shadow-md">
+        <h1 class="text-2xl font-semibold mb-6 text-white text-center bg-gradient-to-r from-cyan-400 to-pink-500 text-transparent bg-clip-text">
+            Flight Prompts
+        </h1>
+        <ul id="prompt-list">
+            </ul>
+    </div>
+
+    <script>
+        const promptData = [
+            { prompt: "Should I book my flight in advance?" },
+            { prompt: "Could I change my flight after booking?" },
+            { prompt: "Should I arrive early for my flight?" },
+            { prompt: "Could I get a refund if my flight is canceled?" },
+            { prompt: "Should I check the departure board at the airport?" },
+            { prompt: "Could I book a hotel along with my flight?" },
+            { prompt: "Should I print my boarding pass or is a digital one enough?" },
+            { prompt: "Could I bring extra luggage if I pay for it?" },
+            { prompt: "Should I buy travel insurance for my flight?" },
+            { prompt: "Could I select my seat when booking a flight?" },
+            { prompt: "Should I check in online before my flight?" },
+            { prompt: "Could I find last-minute flight deals?" },
+            { prompt: "Should I notify the airline about my dietary restrictions?" },
+            { prompt: "Could I use public transportation to get to the airport?" },
+            { prompt: "Should I bring a passport for a domestic flight?" },
+            { prompt: "Could I track my flight’s status in real time?" },
+            { prompt: "Should I book a taxi from the airport in advance?" },
+            { prompt: "Could I travel with a pet on my flight?" },
+            { prompt: "Should I exchange currency before flying?" },
+            { prompt: "Could I rebook my flight if I miss it?" },
+            { prompt: "Should I pack essential medicines in my carry-on?" },
+            { prompt: "Could I find Wi-Fi at the airport?" },
+            { prompt: "Should I confirm my flight the day before?" },
+            { prompt: "Could I bring food through airport security?" },
+            { prompt: "Should I book a rental car before arriving?" },
+            { prompt: "Could I check baggage for a connecting flight?" },
+            { prompt: "Should I tip airport or taxi staff?" },
+            { prompt: "Could I sleep at the airport overnight?" },
+            { prompt: "Should I download offline maps before traveling?" },
+            { prompt: "Could I claim compensation for a delayed flight?" },
+        ];
+
+        const promptList = document.getElementById('prompt-list');
+
+        promptData.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.className = 'prompt-item';
+
+            const promptTextSpan = document.createElement('span');
+            promptTextSpan.className = 'prompt-text';
+            promptTextSpan.textContent = item.prompt;
+
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-button';
+            copyButton.textContent = 'Copy';
+
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'icon';  // Adds the icon class
+
+            copyButton.prepend(iconSpan); // Insert the icon before the text
+
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(item.prompt).then(() => {
+                    copyButton.textContent = 'Copied!';
+                    copyButton.classList.add('bg-green-500', 'text-white'); //change color
+                    setTimeout(() => {
+                        copyButton.textContent = 'Copy'; //change text
+                        copyButton.classList.remove('bg-green-500', 'text-white');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    copyButton.textContent = 'Error';
+                     setTimeout(() => {
+                        copyButton.textContent = 'Copy';
+                    }, 2000);
+                });
+            });
+
+            listItem.appendChild(promptTextSpan);
+            listItem.appendChild(copyButton);
+            promptList.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>
