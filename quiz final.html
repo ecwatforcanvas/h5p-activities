@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G.I.M. Story Quiz</title>
+    <style>
+        body {
+            background-color: #0d0221;
+            color: #f700ff;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            text-shadow: 0 0 5px #f700ff;
+        }
+        .cyber-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #f700ff;
+            box-shadow: 0 0 20px #f700ff;
+            padding: 20px;
+            background-color: rgba(13, 2, 33, 0.8);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-left: 3px solid #f700ff;
+            background-color: rgba(42, 10, 69, 0.5);
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button.option {
+            background-color: #2a0a45;
+            color: #f700ff;
+            border: 1px solid #f700ff;
+            padding: 10px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button.option:hover {
+            background-color: #f700ff;
+            color: #0d0221;
+            box-shadow: 0 0 10px #f700ff;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #2a0a45;
+            margin: 20px 0;
+            height: 10px;
+            border: 1px solid #f700ff;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #f700ff;
+            transition: width 0.5s;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            display: none;
+            border: 1px solid;
+        }
+        .correct {
+            border-color: #00ff00;
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+        .incorrect {
+            border-color: #ff0000;
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+        #results {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        #restart {
+            background-color: #f700ff;
+            color: #0d0221;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-container">
+        <h1>GLITCH INTO THE MOOC: STORY QUIZ</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div id="quiz-container"></div>
+        
+        <div id="results">
+            <h2>SYSTEM ANALYSIS COMPLETE</h2>
+            <p>Your score: <span id="score">0</span>/5</p>
+            <button id="restart">REBOOT QUIZ</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Qué desencadena el glitch al inicio de la historia?",
+                options: [
+                    "El estudiante envía una tarea mal escrita",
+                    "El estudiante instala un juego pirata",
+                    "El estudiante envía su tarea del curso 'English with AI tools'",
+                    "Cortana envía un virus"
+                ],
+                answer: 2,
+                explanation: "Correcto! El glitch ocurre cuando envía su tarea del curso online."
+            },
+            {
+                question: "¿Cuál es la contraseña para escapar de la papelera de reciclaje?",
+                options: [
+                    "Windows10",
+                    "AI tools",
+                    "Grammar",
+                    "Copilot"
+                ],
+                answer: 1,
+                explanation: "Exacto! La contraseña es 'AI tools', relacionada con el curso."
+            },
+            {
+                question: "¿Qué representa realmente el acrónimo G.I.M.?",
+                options: [
+                    "Grammar Is Magic",
+                    "Global Interface Module",
+                    "Galactic Intelligence Monitor",
+                    "General Interactive Machine"
+                ],
+                answer: 2,
+                explanation: "Así es! G.I.M. significa 'Galactic Intelligence Monitor', el alienígena creador de Grammar Overload."
+            },
+            {
+                question: "¿Cuál es la contraseña final para enfrentar a GIM?",
+                options: [
+                    "robot",
+                    "robota",
+                    "bots",
+                    "android"
+                ],
+                answer: 1,
+                explanation: "Correcto! Es 'robota', la palabra etimológica checa para 'robot'."
+            },
+            {
+                question: "¿Qué tipo de juego sería ideal para la batalla final según la historia?",
+                options: [
+                    "Un juego de cartas",
+                    "Un bullet hell gramatical",
+                    "Un rompecabezas",
+                    "Un juego de carreras"
+                ],
+                answer: 1,
+                explanation: "Perfecto! Un bullet hell con elementos gramaticales combinaría acción y aprendizaje."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const quizContainer = document.getElementById('quiz-container');
+        const progressBar = document.getElementById('progress');
+        const resultsContainer = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const restartButton = document.getElementById('restart');
+
+        function displayQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            const questionHTML = `
+                <div class="question">
+                    <p>${currentQuestion + 1}. ${question.question}</p>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <button class="option" onclick="checkAnswer(${index})">${option}</button>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback-${currentQuestion}"></div>
+                </div>
+            `;
+
+            quizContainer.innerHTML = questionHTML;
+            updateProgress();
+        }
+
+        function checkAnswer(selectedIndex) {
+            const question = questions[currentQuestion];
+            const feedback = document.getElementById(`feedback-${currentQuestion}`);
+            
+            if (selectedIndex === question.answer) {
+                feedback.textContent = "✓ " + question.explanation;
+                feedback.className = "feedback correct";
+                score++;
+            } else {
+                feedback.textContent = "✗ Incorrecto. " + question.explanation;
+                feedback.className = "feedback incorrect";
+            }
+            
+            feedback.style.display = "block";
+            currentQuestion++;
+            
+            setTimeout(() => {
+                displayQuestion();
+            }, 2000);
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestion / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showResults() {
+            quizContainer.style.display = "none";
+            resultsContainer.style.display = "block";
+            scoreElement.textContent = score;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizContainer.style.display = "block";
+            resultsContainer.style.display = "none";
+            displayQuestion();
+        }
+
+        restartButton.addEventListener('click', restartQuiz);
+
+        // Initialize quiz
+        displayQuestion();
+    </script>
+</body>
+</html>
