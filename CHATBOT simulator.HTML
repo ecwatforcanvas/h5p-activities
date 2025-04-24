@@ -1,179 +1,288 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
+<html lang="en"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot Simulado - Cyberpunk</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Simulador UTEC AI Tool</title> <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
     <style>
-        /* --- Paleta de Colores Cyberpunk --- */
+        /* --- Color Palette based on English Course Objectives Theme --- */
         :root {
-            --bg-dark: #0d0221;
-            --bg-medium: #261447;
-            --accent-cyan: #00f5d4;
-            --accent-pink: #ff00f5;
-            --text-light: #f0f0f0;
-            --text-dark: #1a1a1a;
-            --border-glow: 0 0 10px var(--accent-cyan); /* Más intenso */
-            --metallic-glow: 0 0 5px #fff, 0 0 10px var(--accent-cyan), 0 0 15px #fff; /* Efecto metálico */
+            /* Gradient colors from the image */
+            --gradient-start: #E91E63; /* Reddish-pink */
+            --gradient-end: #F06292; /* Lighter pink */
+
+            /* Container background - Dark reddish-purple with transparency */
+            --bg-container: rgba(50, 10, 30, 0.9);
+
+            /* Border and shadow color - Darker shade of the gradient */
+            --border-color: #AD1457; /* Darker shade */
+
+            /* Heading and marker color - Light pink */
+            --accent-color: #FF80AB; /* Light pink */
+
+            /* Text color - White */
+            --text-light: #FFFFFF;
+
+            /* Darker background for input area and chatbox */
+            --bg-dark: rgba(30, 5, 15, 0.7); /* Darker reddish-purple */
+
+            /* Metallic Glow Effect */
+            --metallic-glow: 0 0 5px rgba(255, 255, 255, 0.8), /* White highlight */
+                             0 0 10px rgba(200, 200, 200, 0.6), /* Lighter grey shadow */
+                             0 0 15px rgba(150, 150, 150, 0.4); /* Darker grey shadow */
+
+            /* Border Glow (used for focus/hover) */
+            --border-glow: 0 0 10px var(--accent-color); /* Glow based on accent color */
         }
 
-        /* --- Estilos Generales --- */
+        /* --- General Styles --- */
         body {
-            font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, var(--bg-dark), #1a0a3d);
+            /* Changed font-family to Inter, keeping Orbitron as a fallback or for specific elements like headings if needed */
+            font-family: 'Inter', sans-serif;
+            /* Apply the gradient background */
+            background: linear-gradient(to bottom, var(--gradient-start), var(--gradient-end));
             color: var(--text-light);
+            min-height: 100vh; /* Ensure gradient covers the full viewport height */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            /* Removed position: relative; */
         }
 
-        /* --- Contenedor Principal --- */
+        /* --- Main Container --- */
         .chat-container {
-            background-color: rgba(38, 20, 71, 0.8);
-            border: 1px solid var(--accent-cyan);
-            box-shadow: var(--border-glow); /* Aplica el glow */
+            background-color: var(--bg-container); /* Use the dark reddish-purple container background */
+            border: 1px solid var(--border-color); /* Use the darker shade for border */
+            box-shadow: var(--border-glow); /* Apply the border glow */
             backdrop-filter: blur(5px);
-            max-width: 90%; /* Más ancho */
-            margin: 0 auto; /* Centrar si es necesario */
+            width: 100%; /* Use full width */
+            max-width: 900px; /* Max width */
+            margin: 0 auto; /* Center */
+            border-radius: 0.5rem; /* rounded-lg */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 85vh; /* Increased container height slightly */
         }
 
-        /* --- Cabecera --- */
+        /* --- Header --- */
         .chat-header {
-            background-color: var(--bg-medium);
-            border-bottom: 1px solid var(--accent-pink);
-            text-shadow: 0 0 5px var(--accent-pink);
+            background-color: rgba(50, 10, 30, 0.9); /* Slightly darker than container background */
+            border-bottom: 1px solid var(--border-color); /* Use the darker shade for border */
+            text-shadow: 0 0 5px var(--accent-color); /* Text shadow based on accent color */
+            padding: 1rem; /* p-4 */
+            border-top-left-radius: 0.5rem; /* rounded-t-lg */
+            border-top-right-radius: 0.5rem; /* rounded-t-lg */
+            display: flex;
+            align-items: center;
+        }
+         /* Keep Orbitron for the main title for a thematic look */
+        .chat-header h2 {
+             font-family: 'Orbitron', sans-serif;
         }
 
-        /* --- Caja de Chat --- */
+
+        /* --- Chat Box --- */
         #chatbox {
-            background-color: rgba(13, 2, 33, 0.7);
-            font-family: 'Orbitron', sans-serif;
+            background-color: var(--bg-dark); /* Use the darker background color */
+            /* Removed font-family here to inherit from body */
             font-size: 1rem;
-            overflow-x: hidden;
+            overflow-y: auto; /* overflow-y-auto */
+            flex-grow: 5; /* Increased flex-grow significantly */
+            padding: 1rem; /* p-4 */
         }
 
-        /* --- Burbujas de Chat --- */
+        /* --- Chat Bubbles --- */
         .chat-bubble {
             max-width: 75%;
-            padding: 12px 18px;
-            margin-bottom: 12px;
+            padding: 0.75rem 1.125rem; /* 12px 18px */
+            margin-bottom: 0.75rem; /* 12px */
             border-radius: 10px;
             word-wrap: break-word;
             position: relative;
             border: 1px solid transparent;
             white-space: normal;
-            box-shadow: var(--metallic-glow); /* Aplica el efecto metálico a las burbujas */
+            box-shadow: var(--metallic-glow); /* Apply the metallic effect to bubbles */
         }
 
         .user-bubble {
-            background-color: rgba(0, 245, 212, 0.15);
-            border-color: var(--accent-cyan);
+            background-color: rgba(255, 128, 171, 0.15); /* Semi-transparent light pink */
+            border-color: var(--accent-color); /* Use the accent color for border */
             margin-left: auto;
-            color: var(--accent-cyan);
-            text-shadow: 0 0 3px rgba(0, 245, 212, 0.7);
+            color: var(--text-light); /* White text for user bubbles */
+            text-shadow: 0 0 3px rgba(255, 128, 171, 0.7); /* Text shadow based on light pink */
             border-bottom-right-radius: 2px;
         }
 
         .bot-bubble {
-            background-color: rgba(255, 0, 245, 0.15);
-            border-color: var(--accent-pink);
+            background-color: rgba(173, 20, 87, 0.15); /* Semi-transparent darker shade */
+            border-color: var(--border-color); /* Use the darker shade for border */
             margin-right: auto;
-            color: var(--accent-pink);
-            text-shadow: 0 0 3px rgba(255, 0, 245, 0.7);
+            color: var(--text-light); /* White text for bot bubbles */
+            text-shadow: 0 0 3px rgba(173, 20, 87, 0.7); /* Text shadow based on darker shade */
             border-bottom-left-radius: 2px;
         }
         .bot-bubble.error {
-            color: #ff4d4d;
+            color: #ff4d4d; /* Keep error color distinct */
             border-color: #ff4d4d;
             background-color: rgba(255, 77, 77, 0.15);
             text-shadow: 0 0 3px rgba(255, 77, 77, 0.7);
         }
 
-        /* --- Área de Entrada --- */
+        /* --- Input Area --- */
         .input-area {
-            background-color: var(--bg-medium);
-            border-top: 1px solid var(--accent-cyan);
+            background-color: rgba(50, 10, 30, 0.9); /* Same as chat header background */
+            border-top: 1px solid var(--border-color); /* Use the darker shade for border */
+            padding: 1rem; /* p-4 */
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 0.5rem; /* rounded-b-lg */
+            border-bottom-right-radius: 0.5rem; /* rounded-b-lg */
+            flex-shrink: 0; /* Prevent shrinking */
         }
 
         #userInput {
-            background-color: var(--bg-dark);
-            border: 1px solid var(--accent-pink);
-            color: var(--text-light);
+            background-color: var(--bg-dark); /* Use the darker background color */
+            border: 1px solid var(--border-color); /* Use the darker shade for border */
+            color: var(--text-light); /* White text for input */
             border-radius: 5px;
-            caret-color: var(--accent-cyan);
-            width: calc(100% - 120px); /* Ajusta el ancho para el botón */
+            caret-color: var(--accent-color); /* Caret color based on accent color */
+            flex-grow: 1; /* Take available space */
+            padding: 0.5rem 1rem; /* px-4 py-2 */
+            margin-right: 0.75rem; /* mr-3 */
         }
         #userInput::placeholder {
-            color: rgba(240, 240, 240, 0.5);
+            color: rgba(255, 255, 255, 0.5); /* Semi-transparent white placeholder */
         }
         #userInput:focus {
             outline: none;
-            box-shadow: var(--border-glow);
-            border-color: var(--accent-cyan);
+            box-shadow: var(--border-glow); /* Apply the border glow on focus */
+            border-color: var(--accent-color); /* Border color based on accent color on focus */
         }
 
         #sendButton {
-            background-color: var(--accent-pink);
-            color: var(--text-dark);
+            background-color: var(--accent-color); /* Background based on accent color */
+            color: #1a1a1a; /* Dark text for button */
             font-weight: 700;
             border-radius: 5px;
             transition: all 0.3s ease;
-            border: 1px solid var(--accent-pink);
+            border: 1px solid var(--accent-color); /* Border based on accent color */
             text-shadow: none;
-            box-shadow: var(--metallic-glow); /* Aplica el efecto metálico al botón */
+            box-shadow: var(--metallic-glow); /* Apply the metallic effect to the button */
+            padding: 0.5rem 1.25rem; /* py-2 px-5 */
+            flex-shrink: 0; /* Prevent shrinking */
         }
         #sendButton:hover {
-            background-color: var(--accent-cyan);
-            color: var(--text-dark);
-            border-color: var(--accent-cyan);
-            box-shadow: var(--border-glow);
+            background-color: var(--border-color); /* Background based on darker shade on hover */
+            color: var(--text-light); /* White text on hover */
+            border-color: var(--border-color); /* Border based on darker shade on hover */
+            box-shadow: var(--border-glow); /* Apply the border glow on hover */
         }
 
-        /* --- Scrollbar (Opcional, para navegadores Webkit) --- */
+        /* --- Scrollbar (Optional, for Webkit browsers) --- */
         #chatbox::-webkit-scrollbar {
             width: 8px;
         }
         #chatbox::-webkit-scrollbar-track {
-            background: var(--bg-medium);
+            background: var(--bg-container); /* Scrollbar track based on container background */
         }
         #chatbox::-webkit-scrollbar-thumb {
-            background-color: var(--accent-pink);
+            background-color: var(--border-color); /* Scrollbar thumb based on darker shade */
             border-radius: 4px;
-            border: 1px solid var(--bg-dark);
+            border: 1px solid var(--bg-dark); /* Border based on dark background */
         }
         #chatbox::-webkit-scrollbar-thumb:hover {
-            background-color: var(--accent-cyan);
+            background-color: var(--accent-color); /* Scrollbar thumb based on accent color on hover */
+        }
+
+        /* --- Fixed Prompts Area --- */
+        .fixed-prompts-container {
+            width: 100%; /* Take full width of the container */
+            background-color: rgba(50, 10, 30, 0.9); /* Same as input area background */
+            padding: 0.5rem 1rem; /* Reduced padding */
+            display: flex;
+            justify-content: center; /* Center the buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            gap: 0.3rem; /* Reduced space between buttons */
+            border-top: 1px solid var(--border-color); /* Border on top */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .prompt-button {
+            background-color: rgba(255, 128, 171, 0.8); /* Semi-transparent light pink */
+            color: #1a1a1a; /* Dark text */
+            font-weight: 700;
+            padding: 0.3rem 0.6rem; /* Reduced padding for smaller buttons */
+            border-radius: 5px;
+            cursor: pointer; /* Indicate it's clickable */
+            text-align: center;
+            box-shadow: var(--metallic-glow); /* Apply metallic glow */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease; /* Added transform for click effect */
+            border: 1px solid var(--accent-color); /* Border based on accent color */
+            flex-grow: 1; /* Allow buttons to grow */
+            max-width: 150px; /* Reduced max width for buttons */
+            font-size: 0.9rem; /* Slightly smaller font size */
+        }
+
+        .prompt-button:hover {
+            background-color: var(--accent-color); /* Solid light pink on hover */
+            box-shadow: var(--border-glow); /* Border glow on hover */
+        }
+
+        .prompt-button:active {
+            transform: scale(0.98); /* Slightly shrink on click */
         }
 
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div class="chat-container rounded-lg shadow-lg flex flex-col h-[80vh] overflow-hidden">
-        <div class="chat-header text-white p-4 rounded-t-lg flex items-center">
-            <h2 class="text-xl font-bold tracking-wider">SIMULADOR_CYBER_TUTOR</h2>
+    <div class="chat-container rounded-lg shadow-lg flex flex-col h-[85vh] overflow-hidden"> <div class="chat-header text-white p-4 rounded-t-lg flex items-center">
+            <h2 class="text-xl font-bold tracking-wider">SIMULADOR UTEC AI TOOL</h2>
         </div>
 
-        <div id="chatbox" class="flex-1 p-4 overflow-y-auto">
-            <div class="chat-bubble bot-bubble">
-                <span class="font-bold">[SYSTEM]:</span> Simulador activado. Ingresa un prompt de la lista de tu curso (ej: 'saludo', 'present simple', 'past simple').
+        <div id="chatbox" class="flex-1 p-4 overflow-y-auto"> <div class="chat-bubble bot-bubble">
+                <span class="font-bold">[SYSTEM]:</span> Simulator activated. Enter a prompt from your course list or click the prompt buttons below!
             </div>
         </div>
 
         <div class="input-area p-4 flex items-center rounded-b-lg">
-            <input type="text" id="userInput" class="px-4 py-2 mr-3 focus:outline-none" placeholder="Ingresa prompt aquí...">
+            <input type="text" id="userInput" class="px-4 py-2 mr-3 focus:outline-none" placeholder="Enter prompt here...">
             <button id="sendButton" class="py-2 px-5 transition duration-300">
-                ENVIAR
+                SEND
             </button>
+        </div>
+
+        <div class="fixed-prompts-container">
+            <div class="prompt-button" data-prompt="Should and Could">Should and Could</div>
+            <div class="prompt-button" data-prompt="Kind of tickets and trips">Kind of tickets and trips</div>
+            <div class="prompt-button" data-prompt="Travel services">Travel services</div>
+            <div class="prompt-button" data-prompt="Some flight problems">Some flight problems</div>
+            <div class="prompt-button" data-prompt="Transportation problems">Transportation problems</div>
+            <div class="prompt-button" data-prompt="Means of transportation">Means of transportation</div>
+            <div class="prompt-button" data-prompt="Be going to">Be going to</div>
+            <div class="prompt-button" data-prompt="Object Pronouns">Object Pronouns</div>
+            <div class="prompt-button" data-prompt="Comparative adjectives">Comparative adjectives</div>
+            <div class="prompt-button" data-prompt="Superlative adjectives">Superlative adjectives</div>
+            <div class="prompt-button" data-prompt="The past tense">The past tense</div>
+            <div class="prompt-button" data-prompt="Regular and Irregular verbs">Regular and Irregular verbs</div>
+            <div class="prompt-button" data-prompt="Can and Have to">Can and Have to</div>
+            <div class="prompt-button" data-prompt="The simple present tense">The simple present tense</div>
+            <div class="prompt-button" data-prompt="Frequency adverbs">Frequency adverbs</div>
+            <div class="prompt-button" data-prompt="Time expressions">Time expressions</div>
         </div>
     </div>
 
     <script>
-        // --- Elementos del DOM ---
+        // --- DOM Elements ---
         const chatbox = document.getElementById('chatbox');
         const userInput = document.getElementById('userInput');
         const sendButton = document.getElementById('sendButton');
+        const promptButtons = document.querySelectorAll('.prompt-button'); // Changed variable name
 
         // --- Event Listeners ---
         sendButton.addEventListener('click', sendMessage);
@@ -183,13 +292,26 @@
             }
         });
 
-        // --- Funciones ---
+        // --- Prompt Button Click Functionality ---
+        promptButtons.forEach(button => {
+            button.addEventListener('click', handlePromptButtonClick);
+        });
+
+        function handlePromptButtonClick(e) {
+            const prompt = e.target.dataset.prompt;
+            if (prompt) {
+                userInput.value = prompt; // Put the prompt in the input field
+                sendMessage(); // Send the message
+            }
+        }
+
+        // --- Functions ---
 
         /**
-         * Añade un mensaje a la ventana de chat.
-         * @param {string} message - El texto del mensaje.
-         * @param {string} sender - 'user' o 'bot'.
-         * @param {boolean} isError - Indica si es un mensaje de error del bot.
+         * Adds a message to the chat window.
+         * @param {string} message - The message text.
+         * @param {string} sender - 'user' or 'bot'.
+         * @param {boolean} isError - Indicates if it's a bot error message.
          */
         function addMessageToChatbox(message, sender, isError = false) {
             const messageElement = document.createElement('div');
@@ -199,14 +321,14 @@
                 messageElement.classList.add('error');
             }
 
-            // Añadir prefijo para claridad
+            // Add prefix for clarity
             const prefix = sender === 'user' ? '[USER]: ' : (isError ? '[ERROR]: ' : '[BOT_SIM]: ');
             const prefixSpan = document.createElement('span');
             prefixSpan.className = 'font-bold mr-1';
             prefixSpan.textContent = prefix;
 
             messageElement.appendChild(prefixSpan);
-             // Quita el prefijo del mensaje si ya lo tenía para evitar duplicados
+             // Remove the prefix from the message if it already had it to avoid duplicates
             message = message.replace(/^\[(SYSTEM|ERROR|BOT_SIM)\]:\s*/, '');
             messageElement.appendChild(document.createTextNode(message));
 
@@ -215,7 +337,7 @@
         }
 
         /**
-         * Envía el mensaje del usuario y obtiene una respuesta predefinida.
+         * Sends the user message and gets a predefined response.
          */
         async function sendMessage() {
             const messageText = userInput.value.trim();
@@ -224,15 +346,15 @@
             addMessageToChatbox(messageText, 'user');
             userInput.value = '';
 
-            // Indicador de "procesando..." simulado
-            addMessageToChatbox("Processing prompt...", 'bot'); // En inglés
+            // Simulated "processing..." indicator
+            addMessageToChatbox("Processing prompt...", 'bot');
             const thinkingBubble = chatbox.lastChild;
 
             try {
                 const botResponse = await getPredefinedResponse(messageText);
 
-                // Espera un poquito más para que se vea el "Procesando..."
-                await new Promise(resolve => setTimeout(resolve, 300));
+                // Wait a bit longer to show the "Processing..."
+                await new Promise(resolve => setTimeout(resolve, 600)); // Increased delay slightly
 
                 chatbox.removeChild(thinkingBubble);
                 addMessageToChatbox(botResponse, 'bot');
@@ -240,110 +362,101 @@
             } catch (error) {
                 console.error("Unexpected error in script:", error);
                 chatbox.removeChild(thinkingBubble);
-                addMessageToChatbox(`Internal script failure: ${error.message}`, 'bot', true); // En inglés
+                addMessageToChatbox(`Internal script failure: ${error.message}`, 'bot', true);
             }
         }
 
         /**
-         * Devuelve una respuesta predefinida basada en el mensaje del usuario.
+         * Returns a predefined response based on the user message.
          *
-         * @param {string} userMessage - El mensaje/prompt ingresado por el usuario.
-         * @returns {Promise<string>} - Una promesa que resuelve con la respuesta predefinida.
+         * @param {string} userMessage - The message/prompt entered by the user.
+         * @returns {Promise<string>} - A promise that resolves with the predefined response.
          */
         function getPredefinedResponse(userMessage) {
             const lowerCaseMessage = userMessage.toLowerCase().trim();
 
-            // --- ¡DEFINE AQUÍ TUS PROMPTS Y RESPUESTAS! ---
-             let response = "[SIM] Command not recognized. Check the list of prompts for your course. Try 'hello', 'present simple', 'past simple'."; // Respuesta por defecto en inglés
+            // --- DEFINE YOUR PROMPTS AND RESPONSES HERE! ---
+             let response = "[SIM] Command not recognized. Check the list of prompts for your course or click the prompt buttons below. Try 'hello', 'present simple', 'past simple'."; // Default response
 
             if (lowerCaseMessage.includes("hola") || lowerCaseMessage.includes("saludo") || lowerCaseMessage.includes("hello")) {
-                response = "[SIM] Hello! Welcome to the Cyber Tutor simulator. I'm ready to answer your prompts about English grammar. Try 'present simple' or 'past simple'."; // En inglés
+                response = "[SIM] Hello! Welcome to the UTEC AI Tool simulator. I'm ready to answer your prompts about English grammar and travel vocabulary. Try 'present simple' or 'past simple', or use the prompt buttons!";
             }
             else if (lowerCaseMessage.includes("present simple")) {
-                response = "[SIM] The 'Present Simple' is used for habits, routines, and general facts. Affirmative structure: Subject + Verb (add -s/-es for he/she/it). Example: 'She works from home.' // 'They live in Zaragoza.'"; // En inglés
+                response = "[SIM] The 'Present Simple' is used for habits, routines, and general facts. Affirmative structure: Subject + Verb (add -s/-es for he/she/it). Example: 'She works from home.' // 'They live in Zaragoza.'";
             }
              else if (lowerCaseMessage.includes("ejemplo pregunta present simple")) {
                 response = "[SIM] Present Simple Question: Do/Does + Subject + Verb (base)? Example: 'Do you speak English?' // 'Does he play the guitar?'";
             }
             else if (lowerCaseMessage.includes("past simple")) {
-                response = "[SIM] The 'Past Simple' describes actions completed in the past. Regular verbs: add -ed. Irregular verbs: you have to memorize them! Example: 'I watched a movie.' (regular) // 'She went to the party.' (irregular)"; // En inglés
+                response = "[SIM] The 'Past Simple' describes actions completed in the past. Regular verbs: add -ed. Irregular verbs: you have to memorize them! Example: 'I watched a movie.' (regular) // 'She went to the party.' (irregular)";
             }
              else if (lowerCaseMessage.includes("negativa past simple")) {
                 response = "[SIM] Past Simple Negative: Subject + did not (didn't) + Verb (base). Example: 'I didn't watch TV.' // 'He didn't go to the party.'";
             }
             else if (lowerCaseMessage.includes("adiós") || lowerCaseMessage.includes("bye") || lowerCaseMessage.includes("exit")) {
-                response = "[SIM] Disconnecting simulator. Keep practicing your English!"; // En inglés
+                response = "[SIM] Disconnecting simulator. Keep practicing your English!";
             }
-            // --- Nuevos prompts de vuelos ---
-            else if (lowerCaseMessage.includes("should i book my flight in advance?")) {
-                response = "[SIM] Yes, booking in advance usually gives you better prices and more options. Airlines often increase fares as the departure date gets closer. I recommend booking at least 3-4 weeks ahead for domestic flights and 2-3 months for international ones.";
-            } else if (lowerCaseMessage.includes("could i change my flight after booking?")) {
-                response = "[SIM] Most airlines allow flight changes, but fees may apply depending on your ticket type. Check your airline's policy or contact customer service. Some flexible tickets offer free changes within a certain period.";
-            } else if (lowerCaseMessage.includes("should i arrive early for my flight?")) {
-                response = "[SIM] Yes! For domestic flights, arrive at least 2 hours before departure, and for international flights, 3 hours is recommended. This allows time for check-in, security checks, and unexpected delays.";
-            } else if (lowerCaseMessage.includes("could i get a refund if my flight is canceled?")) {
-                response = "[SIM] Yes, if the airline cancels your flight, you’re usually entitled to a refund or rebooking. Some airlines may also offer compensation depending on the circumstances and local regulations.";
-            } else if (lowerCaseMessage.includes("should i check the departure board at the airport?")) {
-                response = "[SIM] Absolutely! Departure boards display real-time updates on gate changes, delays, and cancellations. Always verify your flight status before heading to the gate.";
-            } else if (lowerCaseMessage.includes("could i book a hotel along with my flight?")) {
-                response = "[SIM] Yes, many travel websites and airlines offer package deals for flights + hotels, which can save you money. Would you like me to help you find one?";
-            } else if (lowerCaseMessage.includes("should i print my boarding pass or is a digital one enough?")) {
-                response = "[SIM] Most airlines accept digital boarding passes on your phone, but it’s a good idea to have a backup (printed or saved as PDF) in case of technical issues.";
-            } else if (lowerCaseMessage.includes("could i bring extra luggage if i pay for it?")) {
-                response = "[SIM] Yes, airlines usually allow extra baggage for an additional fee. Check their website for pricing and weight limits to avoid surprises at the airport.";
-            } else if (lowerCaseMessage.includes("should i buy travel insurance for my flight?")) {
-                response = "[SIM] It’s highly recommended, especially for international trips. Travel insurance can cover cancellations, medical emergencies, and lost luggage. Better safe than sorry!";
-            } else if (lowerCaseMessage.includes("could i select my seat when booking a flight?")) {
-                response = "[SIM] Yes, most airlines let you choose your seat during booking, sometimes for an extra fee. Window, aisle, or emergency exit seats may have different costs.";
-            } else if (lowerCaseMessage.includes("should i check in online before my flight?")) {
-                response = "[SIM] Definitely! Online check-in (usually 24-48 hours before departure) saves time at the airport and ensures you get your preferred seat.";
-            } else if (lowerCaseMessage.includes("could i find last-minute flight deals?")) {
-                response = "[SIM] Sometimes! Airlines may discount unsold seats close to departure. Check budget airlines or last-minute deal websites, but availability isn’t guaranteed.";
-            } else if (lowerCaseMessage.includes("should i notify the airline about my dietary restrictions?")) {
-                response = "[SIM] Yes, inform the airline at least 48 hours before your flight if you need a special meal (vegetarian, gluten-free, etc.). Most airlines offer options if requested in advance.";
-            } else if (lowerCaseMessage.includes("could i use public transportation to get to the airport?")) {
-                response = "[SIM] Yes, many airports have train, bus, or metro connections. Check schedules in advance, as some services may not run late at night or early in the morning.";
-            } else if (lowerCaseMessage.includes("should i bring a passport for a domestic flight?")) {
-                response = "[SIM] It depends on the country. Some require a passport, while others accept a national ID card. Always check your local regulations before traveling.";
-            } else if (lowerCaseMessage.includes("could i track my flight’s status in real time?")) {
-                response = "[SIM] Yes! Use airline apps, flight tracking websites (like FlightAware), or airport departure boards to monitor delays or gate changes.";
-            } else if (lowerCaseMessage.includes("should i book a taxi from the airport in advance?")) {
-                response = "[SIM] It’s a good idea, especially if you arrive late or in an unfamiliar city. Apps like Uber or local taxi services often let you pre-book rides.";
-            } else if (lowerCaseMessage.includes("could i travel with a pet on my flight?")) {
-                response = "[SIM] Most airlines allow pets, but rules vary (size, carrier requirements, fees). Contact the airline in advance to arrange this and check quarantine laws if traveling internationally.";
-            } else if (lowerCaseMessage.includes("should i exchange currency before flying?")) {
-                response = "[SIM] It’s wise to have some local cash, but airports often have high exchange fees. Consider withdrawing money at an ATM upon arrival or using a travel card.";
-            } else if (lowerCaseMessage.includes("could i rebook my flight if i miss it?")) {
-                response = "[SIM] Yes, but fees may apply. Contact the airline immediately—sometimes they can put you on the next available flight for a lower cost if it’s not your fault.";
-            } else if (lowerCaseMessage.includes("should i pack essential medicines in my carry-on?")) {
-                response = "[SIM] Absolutely! Always keep medications in your hand luggage in case checked bags are delayed. Bring prescriptions if required.";
-            } else if (lowerCaseMessage.includes("could i find wi-fi at the airport?")) {
-                response = "[SIM] Most airports offer free Wi-Fi, though some may limit usage time or require registration. Premium high-speed Wi-Fi is often available for purchase.";
-            } else if (lowerCaseMessage.includes("should i confirm my flight the day before?")) {
-                response = "[SIM] Yes! Airlines sometimes change schedules last-minute. A quick online check or app notification can save you from surprises.";
-            } else if (lowerCaseMessage.includes("could i bring food through airport security?")) {
-                response = "[SIM] Solid food is usually allowed, but liquids (like sauces or yogurt) must follow the 100ml liquid rule. Check your airport’s guidelines to be sure.";
-            } else if (lowerCaseMessage.includes("should i book a rental car before arriving?")) {
-                response = "[SIM] Yes, pre-booking often gives better rates and guarantees availability. Compare prices online and check fuel policies before confirming.";
-            } else if (lowerCaseMessage.includes("could i check baggage for a connecting flight?")) {
-                response = "[SIM] If flights are on the same ticket, bags are usually transferred automatically. If booked separately, you may need to collect and recheck them.";
-            } else if (lowerCaseMessage.includes("should i tip airport or taxi staff?")) {
-                response = "[SIM] Customs vary by country. In the U.S., tipping taxi drivers is expected (15-20%). In some Asian countries, it’s not customary. Research your destination’s norms.";
-            } else if (lowerCaseMessage.includes("could i sleep at the airport overnight?")) {
-                response = "[SIM] Many airports allow it, but comfort varies. Some have sleeping pods or lounges for rent. Check if your airport is sleep-friendly before planning this.";
-            } else if (lowerCaseMessage.includes("should i download offline maps before traveling?")) {
-                response = "[SIM] Yes! Offline maps (Google Maps, Maps.me) are lifesavers if you don’t have data abroad. Download your destination’s map while on Wi-Fi.";
-            } else if (lowerCaseMessage.includes("could i claim compensation for a delayed flight?")) {
-                response = "[SIM] In many countries (like the EU), delays over 3 hours may entitle you to compensation. Check your airline’s policy or websites like AirHelp to file a claim.";
+            else if (lowerCaseMessage.includes("creator") || lowerCaseMessage.includes("gustavo") || lowerCaseMessage.includes("gus")) {
+                response = "[SIM] The creator was Gustavo, a student specializing in the English language degree. To demonstrate that UTEC's online courses are the way forward, he proposes integrating artificial intelligence, or as he calls them, AI tools, for teaching and acquiring the English language.";
+            }
+            else if (lowerCaseMessage.includes("ai") || lowerCaseMessage.includes("tools")  || lowerCaseMessage.includes("chatgpt")  || lowerCaseMessage.includes("copilot")  || lowerCaseMessage.includes("gemini")  || lowerCaseMessage.includes("deepseek") || lowerCaseMessage.includes("aitools")) {
+                response = "[SIM] ChatGPT: A conversational AI developed by OpenAI, known for its ability to generate human-like text, assist with writing, coding, and answering questions. DeepSeek: An AI model focused on deep learning and reasoning, often used for complex problem-solving and research applications. Gemini: Google's AI, designed for multimodal tasks, integrating text, images, and audio to provide comprehensive responses. Copilot: Microsoft's AI assistant, built to enhance productivity by integrating with tools like Word, Excel, and Teams, helping with automation and document processing.";
+            }
+            else if (lowerCaseMessage.includes("Create 10 questions using 'can' and 'have to' for a famous sportstar. The questions should focus on their abilities, routines, and obligations related to their sport. Use a mix of 'can' (to ask about skills, possibilities, or permissions) and 'have to' (to ask about obligations, rules, or requirements).") || lowerCaseMessage.includes("10 questions using 'can'")) {
+                response = "[SIM] The 'Present Simple' is used for habits, routines, and general facts. Affirmative structure: Subject + Verb (add -s/-es for he/she/it). Example: 'She works from home.' // 'They live in Zaragoza.'";
+            }
+            // --- New Prompts from Buttons ---
+            else if (lowerCaseMessage.includes("should and could")) {
+                response = "[SIM] 'Should' is used for advice or suggestions (e.g., 'You should study more.'). 'Could' is used for possibility or making polite requests (e.g., 'It could rain tomorrow.' or 'Could you help me?').";
+            } else if (lowerCaseMessage.includes("kind of tickets and trips")) {
+                 response = "[SIM] Here's some vocabulary for tickets and trips:\n- **One-way ticket:** For a single journey.\n- **Round-trip ticket:** For a journey to a place and back.\n- **Economy class:** The standard, least expensive seating.\n- **Business class:** Offers more comfort and services than economy.\n- **First class:** The most luxurious and expensive option.\n- **Package trip:** Includes flights, accommodation, and sometimes activities.\n- **Cruise:** A trip by ship, usually visiting several places.\n- **Day trip:** A trip completed within one day.";
+            } else if (lowerCaseMessage.includes("travel services")) {
+                response = "[SIM] Here's some vocabulary for travel services:\n- **Travel agency:** A company that helps you plan and book trips.\n- **Tour operator:** Organizes and sells package tours.\n- **Hotel:** Provides accommodation.\n- **Hostel:** Budget accommodation, often with shared rooms.\n- **Rental car:** A car you hire for a period.\n- **Airport transfer:** Transportation from the airport to your accommodation.\n- **Travel insurance:** Protects you against unforeseen events during your trip.\n- **Currency exchange:** Where you can swap money for foreign currency.";
+            } else if (lowerCaseMessage.includes("some flight problems")) {
+                response = "[SIM] Here's some vocabulary for flight problems:\n- **Flight delay:** When your flight departs later than scheduled.\n- **Flight cancellation:** When your flight is called off.\n- **Overbooked flight:** When more passengers are booked than there are seats.\n- **Lost luggage:** When your checked bags don't arrive at your destination.\n- **Missed connection:** When you fail to catch your connecting flight.\n- **Turbulence:** Bumpy air during a flight.\n- **Medical emergency:** A health issue during the flight.";
+            } else if (lowerCaseMessage.includes("transportation problems")) {
+                response = "[SIM] Here's some vocabulary for transportation problems:\n- **Traffic jam:** A long line of vehicles that cannot move or move very slowly.\n- **Breakdown:** When a vehicle stops working.\n- **Flat tire:** When a vehicle's tire loses air.\n- **Detour:** A longer route taken to avoid a closed road.\n- **Strike:** When workers (e.g., train drivers) stop working, causing disruption.\n- **Signal failure:** When traffic lights or train signals stop working.\n- **Congestion:** Overcrowding of vehicles or people.";
+            } else if (lowerCaseMessage.includes("means of transportation")) {
+                response = "[SIM] Here's some vocabulary for means of transportation:\n- **Airplane:** For air travel.\n- **Train:** For rail travel.\n- **Bus:** For road travel, often for longer distances or public transport.\n- **Car:** A personal vehicle.\n- **Taxi:** A car for hire with a driver.\n- **Metro/Subway:** Underground train system in cities.\n- **Tram/Streetcar:** Electric vehicle running on rails in streets.\n- **Bicycle:** Human-powered two-wheeled vehicle.\n- **Motorcycle:** Two-wheeled vehicle with an engine.\n- **Ship/Ferry:** For water travel.";
+            }
+            // --- Added New Prompts and Responses ---
+            else if (lowerCaseMessage.includes("be going to")) {
+                response = "[SIM] 'Be going to' is used to talk about future plans and intentions (e.g., 'I am going to visit my grandparents next week.') or to make predictions based on present evidence (e.g., 'Look at those dark clouds; it's going to rain.').";
+            } else if (lowerCaseMessage.includes("object pronouns")) {
+                response = "[SIM] Object pronouns replace nouns that are the object of a verb or preposition. They are: me, you, him, her, it, us, them. Example: 'She gave the book to **me**.' // 'I saw **him** at the park.'";
+            } else if (lowerCaseMessage.includes("comparative adjectives")) {
+                response = "[SIM] Comparative adjectives are used to compare two things. For short adjectives, add '-er' (e.g., 'taller', 'smaller'). For longer adjectives, use 'more' (e.g., 'more interesting', 'more beautiful'). Example: 'He is **taller** than his brother.' // 'This book is **more interesting** than that one.'";
+            } else if (lowerCaseMessage.includes("superlative adjectives")) {
+                response = "[SIM] Superlative adjectives are used to compare three or more things and indicate the highest degree. For short adjectives, add '-est' and use 'the' (e.g., 'the tallest', 'the smallest'). For longer adjectives, use 'the most' (e.g., 'the most interesting', 'the most beautiful'). Example: 'She is **the tallest** in her class.' // 'This is **the most interesting** movie I've seen.'";
+            } else if (lowerCaseMessage.includes("the past tense")) {
+                response = "[SIM] The past tense (simple past) is used for actions that started and finished at a specific time in the past. It's formed with the past form of the verb (regular verbs add -ed, irregular verbs have unique forms). Example: 'I **played** soccer yesterday.' // 'She **ate** pizza last night.'";
+            } else if (lowerCaseMessage.includes("regular and irregular verbs")) {
+                response = "[SIM] **Regular verbs** form their past tense and past participle by adding '-ed' (e.g., walk - walked - walked). **Irregular verbs** have different forms for the past tense and past participle that don't follow a standard rule and must be memorized (e.g., go - went - gone, eat - ate - eaten).";
+            } else if (lowerCaseMessage.includes("can and have to")) {
+                response = "[SIM] 'Can' is used to express ability or possibility (e.g., 'I **can** swim.' // 'It **can** be cold in winter.'). 'Have to' is used to express obligation or necessity (e.g., 'I **have to** study for the exam.' // 'She **has to** work today.').";
+            } else if (lowerCaseMessage.includes("the simple present tense")) {
+                 response = "[SIM] The 'Simple Present Tense' is used for habits, routines, facts, and scheduled events. Structure: Subject + Base Verb (add -s/-es for he/she/it). Example: 'They **play** football every Saturday.' // 'The sun **rises** in the east.'";
+            } else if (lowerCaseMessage.includes("frequency adverbs")) {
+                 response = "[SIM] Frequency adverbs tell us how often something happens. Common examples: always, usually, often, sometimes, rarely, never. They usually go before the main verb, but after 'be'. Example: 'I **usually** wake up early.' // 'She is **always** happy.'";
+            } else if (lowerCaseMessage.includes("time expressions")) {
+                 response = "[SIM] Time expressions indicate when an action happens. Examples: yesterday, last week, next month, in the morning, at night, on Monday, in 2024. Their position in a sentence can vary, often at the beginning or end. Example: '**Yesterday**, I went to the store.' // 'I will see you **next week**.'";
             }
 
-            // Simula un pequeño retraso
+
+            // Simulate a small delay for the bot response
             return new Promise(resolve => {
                 setTimeout(() => {
                     resolve(response);
                 }, 600);
             });
         }
+
+         // Initial message on load
+         window.onload = function() {
+             // Add initial system message after the DOM is fully loaded
+             // The message is already in the HTML, so no need to add it again here
+         };
+
 
     </script>
 
